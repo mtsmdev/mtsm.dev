@@ -172,21 +172,21 @@ span.tech-logo{background:var(--brand,var(--bone));-webkit-mask:var(--logo) cent
 .cursor{position:fixed;inset:0;z-index:100;pointer-events:none;opacity:0;transition:opacity .3s}
 .cursor.visible{opacity:1}
 .cursor-dot,.cursor-ring{position:absolute;top:0;left:0;will-change:transform}
-.cursor-dot{width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:var(--orange);transition:opacity .2s,scale .2s}
+.cursor-dot{width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:var(--orange);transition:opacity .2s}
 .cursor-ring{width:36px;height:36px;margin:-18px 0 0 -18px;display:grid;place-items:center;border-radius:50%;border:1.5px solid #e9e2d488;transition:width .35s var(--ease-out),height .35s var(--ease-out),margin .35s var(--ease-out),background .3s,border-color .3s,border-radius .3s}
 .cursor-label{font:600 12px 'DM Sans',Arial,sans-serif;letter-spacing:.04em;color:#17120c;opacity:0;transition:opacity .2s;white-space:nowrap}
 html[lang=ar] .cursor-label{font-family:'IBM Plex Sans Arabic',sans-serif;letter-spacing:0}
 .cursor[data-state=link] .cursor-ring{width:56px;height:56px;margin:-28px 0 0 -28px;background:#ff641b1f;border-color:var(--orange)}
-.cursor[data-state=link] .cursor-dot{scale:0}
+.cursor[data-state=link] .cursor-dot{opacity:0}
 .cursor[data-state=drag] .cursor-ring,.cursor[data-state=open] .cursor-ring,.cursor[data-state=grabbing] .cursor-ring{width:72px;height:72px;margin:-36px 0 0 -36px;background:var(--orange);border-color:var(--orange)}
 .cursor[data-state=drag] .cursor-label,.cursor[data-state=open] .cursor-label{opacity:1}
 .cursor[data-state=drag] .cursor-dot,.cursor[data-state=open] .cursor-dot,.cursor[data-state=grabbing] .cursor-dot{opacity:0}
 .cursor[data-state=grabbing] .cursor-ring{width:52px;height:52px;margin:-26px 0 0 -26px}
 .cursor[data-state=text] .cursor-ring{width:4px;height:30px;margin:-15px 0 0 -2px;border-radius:2px;border-color:transparent;background:#e9e2d4aa}
 .cursor[data-state=text] .cursor-dot{opacity:0}
-.cursor.pressed .cursor-ring{scale:.82}
-.cursor[data-state=text].pressed .cursor-ring{scale:1}
-.cursor-ring{transition-property:width,height,margin,background,border-color,border-radius,scale}
+/* Pressing only fades: a scale here would be applied after the move and pull the ring off the pointer. */
+.cursor.pressed .cursor-ring{opacity:.6}
+.cursor-ring{transition-property:width,height,margin,background,border-color,border-radius,opacity}
 [data-magnetic]{transition:translate .35s var(--ease-out),background .3s,box-shadow .4s,border-color .3s,color .3s}
 
 /* Secondary hero action: same pill and icon chip, in the light tone. */
