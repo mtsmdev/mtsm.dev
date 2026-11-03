@@ -1,16 +1,15 @@
 const filters=document.querySelectorAll('[data-filter]');
 const projects=document.querySelectorAll('.archive-project');
 const laptopAction=document.getElementById('laptop-action'),primaryAction=document.querySelector('.hero .primary');
-const modeCopy={
- work:{button:'Bekijk mijn werk',headline:['CODE MET','KOFFIE'],href:'#work',label:'Bekijk mijn projecten'},
- cv:{button:'Bekijk mijn CV',headline:['MOATASEM','AL-REFAAI'],href:'assets/moatasem-cv.pdf',label:'Open mijn volledige CV als PDF'},
- contact:{button:'Mail mij',headline:['LATEN WE','PRATEN'],href:'mailto:career@mtsm.dev',label:'Stuur een e-mail naar career@mtsm.dev'}
-};
+const modeLinks={work:'#work',cv:'assets/moatasem-cv.pdf',contact:'mailto:career@mtsm.dev'};
+// Button, label and headline for a mode, in the current language (see i18n.js).
+const copyFor=mode=>({...i18n.text().mode[mode],href:modeLinks[mode]});
 // The last headline word cycles through what the code is made with, typed like in an editor.
-const headlineWords=[{text:'KOFFIE'},{text:'THEE'},{text:'CHOCOMELK'},{text:'IHSAN',tip:true}];
+// The final word is Ihsan, which gets an explanatory tooltip.
+const wordsFor=()=>i18n.text().words.map((text,i,all)=>({text,tip:i===all.length-1}));
 const ihsanTip=document.getElementById('ihsan-tip'),heroCopy=document.querySelector('.hero-copy');
 let rotator=null;
-function startRotator(word,delay){
+function startRotator(word,delay,headlineWords){
  const wrap=word.parentElement;let index=0,timer=null,tipOpen=false,openedAt=0;
  const later=(ms,next)=>{clearTimeout(timer);timer=setTimeout(next,ms);};
  function placeTip(){
@@ -46,7 +45,7 @@ function startRotator(word,delay){
  later(delay,erase);
  return {stop(){clearTimeout(timer);closeTip(false);document.removeEventListener('pointerdown',outside);removeEventListener('resize',reposition);}};
 }
-function buildRotatingWord(content){
+function buildRotatingWord(content,headlineWords){
  const wrap=document.createElement('span');wrap.className='word-wrap';
  const word=document.createElement('span');word.className='word';word.textContent=headlineWords[0].text;
  const caret=document.createElement('span');caret.className='caret';caret.setAttribute('aria-hidden','true');
@@ -57,8 +56,8 @@ function whenIntroDone(run){
  const watch=new MutationObserver(()=>{if(!document.body.classList.contains('booting')){watch.disconnect();run(2600);}});
  watch.observe(document.body,{attributes:true,attributeFilter:['class']});
 }
-function setLaptopMode(mode){
- const copy=modeCopy[mode];if(!copy)return;
+function setLaptopMode(mode,rebuild=false){
+ if(!modeLinks[mode])return;const copy=copyFor(mode);
  document.body.dataset.laptopMode=mode;
  document.querySelectorAll('[data-laptop-mode]').forEach(link=>{if(link.dataset.laptopMode===mode)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');});
  for(const link of [laptopAction,primaryAction]){link.setAttribute('href',copy.href);link.setAttribute('aria-label',copy.label);if(mode==='cv'){link.target='_blank';link.rel='noopener';}else{link.removeAttribute('target');link.removeAttribute('rel');}}
@@ -66,18 +65,19 @@ function setLaptopMode(mode){
  primaryAction.textContent=copy.button;
  const heading=document.querySelector('.hero h1');
  const current=heading.dataset.mode;
- if(current!==mode){
-  rotator?.stop();rotator=null;let rotatingWord=null;
-  heading.replaceChildren(...copy.headline.map((text,index)=>{
+ if(current!==mode||rebuild){
+  rotator?.stop();rotator=null;let rotatingWord=null;const words=wordsFor();
+  const lines=mode==='work'?[copy.headline,null]:copy.headline;
+  heading.replaceChildren(...lines.map((text,index)=>{
    const line=document.createElement('span');line.className='line';
    const content=document.createElement('span');
-   if(index===1&&mode==='work')rotatingWord=buildRotatingWord(content);else content.textContent=text;
+   if(index===1&&mode==='work')rotatingWord=buildRotatingWord(content,words);else content.textContent=text;
    if(index===1){const dot=document.createElement('span');dot.className='dot';dot.textContent='.';content.append(dot);}
    line.append(content);return line;
   }));
   heading.dataset.mode=mode;
   const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(rotatingWord&&!reducedMotion)whenIntroDone(delay=>{if(rotatingWord.isConnected&&!rotator)rotator=startRotator(rotatingWord,delay);});
+  if(rotatingWord&&!reducedMotion)whenIntroDone(delay=>{if(rotatingWord.isConnected&&!rotator)rotator=startRotator(rotatingWord,delay,words);});
  }
  window.dispatchEvent(new CustomEvent('laptopmodechange',{detail:mode}));
 }
@@ -121,6 +121,14 @@ filters.forEach(button=>button.addEventListener('click',()=>{
  filters.forEach(b=>{b.classList.toggle('active',b===button);b.setAttribute('aria-pressed',String(b===button));});
  let count=0;
  projects.forEach(project=>{const show=button.dataset.filter==='all'||project.dataset.category===button.dataset.filter;project.hidden=!show;if(show)count++;});
- document.querySelector('.filter-count').textContent=count+' projecten';
+ updateCount(count);
 }));
+const counter=document.querySelector('.filter-count');
+function updateCount(count){counter.textContent=i18n.plural(count,i18n.text().projects);}
+updateCount(projects.length);
+// Re-render script-made copy when the visitor switches language.
+window.addEventListener('i18nchange',()=>{
+ setLaptopMode(document.body.dataset.laptopMode||'work',true);
+ updateCount([...projects].filter(p=>!p.hidden).length);
+});
 

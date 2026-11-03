@@ -126,3 +126,16 @@ footer{padding-bottom:70px}
  .hero .primary{min-height:44px;padding:11px 16px}
  .scroll-journey .annotation{display:none}
 }
+
+/* Language menu in the header. */
+.lang-menu{position:relative;font-size:12px}
+.lang-menu summary{list-style:none;display:flex;align-items:center;gap:7px;min-height:38px;padding:0 13px;border:1px solid #ffffff26;border-radius:999px;color:#d9d2c5;font-weight:600;letter-spacing:.08em;cursor:pointer;transition:border-color .2s,color .2s}
+.lang-menu summary::-webkit-details-marker{display:none}
+.lang-menu summary:hover,.lang-menu[open] summary{border-color:#ff641b99;color:#fff}
+.lang-menu summary:focus-visible{outline:2px solid var(--orange);outline-offset:3px}
+.lang-menu svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.6}
+.lang-menu ul{position:absolute;top:calc(100% + 8px);inset-inline-end:0;z-index:20;min-width:160px;margin:0;padding:6px;list-style:none;background:#1d1c19;border:1px solid #ffffff1f;border-radius:10px;box-shadow:0 14px 34px #0008}
+.lang-menu a{display:block;padding:11px 12px;border-radius:6px;font-size:14px;color:#d9d2c5}
+.lang-menu a:hover,.lang-menu a:focus-visible{background:#2a2925;color:#fff}
+.lang-menu a[aria-current=true]{color:var(--orange)}
+@media(max-width:600px){.brand-name{display:none}.lang-menu summary{min-height:36px;padding:0 10px}}
