@@ -15,9 +15,19 @@ export function Portfolio() {
   );
 }
 `;
-// Only repaint when a typed character or the cursor actually changes.
-export function editorFrameKey(seconds,reduced){
- return reduced?'complete':Math.min(code.length,Math.floor(Math.max(0,seconds-1.6)*70))+':'+Math.floor(seconds*2)%2;
+const lineOf=chars=>{let line=0;for(let i=0;i<chars;i++)if(code.charCodeAt(i)===10)line++;return line;};
+// What the editor shows at a moment: typed characters and cursor visibility.
+export function editorState(seconds,reduced){
+ return {chars:reduced?code.length:Math.min(code.length,Math.floor(Math.max(0,seconds-1.6)*70)),cursor:reduced||Math.floor(seconds*2)%2===0};
+}
+// Screen areas that differ between two editor states, so only those pixels are re-uploaded.
+export function editorDirtyRects(a,b){
+ if(a.chars===b.chars&&a.cursor===b.cursor)return [];
+ const first=lineOf(Math.min(a.chars,b.chars)),last=lineOf(Math.max(a.chars,b.chars));
+ const top=Math.max(145,151+first*36),bottom=Math.min(795,191+last*36);
+ const rects=[{x:345,y:top,w:1255,h:bottom-top}];
+ if(first!==last)rects.push({x:1000,y:970,w:600,h:30});// status bar line counter
+ return rects;
 }
 export function drawEditor(ctx,seconds,reduced){
  const w=1600,h=1000;ctx.fillStyle='#1e1e1e';ctx.fillRect(0,0,w,h);
