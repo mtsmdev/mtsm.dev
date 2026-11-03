@@ -314,3 +314,6 @@ html[lang=ar] .tl-card h3{line-height:1.4}
 .cursor[data-state=eaten] .cursor-dot{opacity:0}
 .btn-trapped{position:absolute;top:0;left:0;z-index:-1;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;border:1.5px solid #17120c70;background:#17120c14;opacity:0;scale:.2;transition:opacity .25s,scale .4s var(--ease-out);pointer-events:none;will-change:transform}
 .btn-trapped.on{opacity:1;scale:1}
+/* During the journey the timeline starts closer to the ruler's dot. */
+.journey-on .work-body{padding-top:20px}
+.journey-on .work .project-filters{margin-bottom:clamp(28px,3.5vw,44px)}

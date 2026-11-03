@@ -224,7 +224,7 @@ function layoutPanel(){
  // The section reserves the panel's space, so the timeline starts right below it.
  // It starts just under the panel's ruler (not under the whole panel), so the timeline is already coming
  // in while the ruler folds into its first dot.
- const ruler=panel.querySelector('.work-ruler'),rulerBottom=panelTop+(ruler?(ruler.offsetTop+ruler.offsetHeight)*panelW/panel.offsetWidth+40:panelH);
+ const ruler=panel.querySelector('.work-ruler'),rulerBottom=panelTop+(ruler?(ruler.offsetTop+ruler.offsetHeight)*panelW/panel.offsetWidth+24:panelH);
  work.style.setProperty('--panel-space',Math.min(panelTop+panelH,rulerBottom,host.clientHeight).toFixed(1)+'px');
 }
 // CSS matrix3d that maps the panel box (w x h) onto a quad: the perspective projection of a square.
