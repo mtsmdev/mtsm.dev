@@ -73,3 +73,18 @@ nav a[aria-current=page]{color:var(--orange)}
 .hero .primary:active{transform:translateY(0)}
 .hero .primary:focus-visible{outline:2px solid #f6e8d8;outline-offset:5px}
 @media(max-width:600px){.hero .primary{padding:14px 19px;min-height:49px;gap:25px}.hero .primary>span{width:21px;height:21px;flex-basis:21px;font-size:22px}}
+
+/* Rotating last headline word, typed with an editor-style caret. */
+.word-wrap{white-space:nowrap}
+.line:has(.word-wrap){padding-bottom:.12em;margin-bottom:calc(8px - .12em)}/* room for the term underline */
+.word{pointer-events:auto;outline:none}
+.word.is-term{cursor:help;text-decoration:underline dotted var(--orange);text-decoration-thickness:.045em;text-underline-offset:.07em}
+.word.is-term:focus-visible{outline:2px solid var(--orange);outline-offset:6px;border-radius:4px}
+.caret{display:inline-block;width:.06em;height:.72em;margin-left:.05em;background:var(--orange);vertical-align:-.01em;animation:caret 1.06s steps(1) infinite}
+.word-wrap.typing .caret{animation:none}
+.reduced .caret{display:none}
+@media(prefers-reduced-motion:reduce){.caret{display:none}}
+@keyframes caret{50%{opacity:0}}
+.word-tip{position:absolute;z-index:6;top:0;left:0;margin:0;width:max-content;max-width:min(340px,calc(100vw - 32px));padding:14px 16px;border-radius:8px;background:#f3ede3;color:#1d1b17;font-size:13px;line-height:1.55;box-shadow:0 14px 34px #0008;pointer-events:none;visibility:hidden;opacity:0;transform:translateY(6px);transition:opacity .18s,transform .18s,visibility 0s .18s}
+.word-tip.open{visibility:visible;opacity:1;transform:none;transition:opacity .18s,transform .18s}
+.word-tip strong{font-weight:700}.word-tip [lang=ar]{color:#a8461a}
