@@ -127,11 +127,12 @@ function governFrameRate(now){
  sampled=slow=0;
 }
 
+let sx=0,sy=0;// pointer position eased so parallax glides instead of stepping with each event
 function pose(now,p){
  const elapsed=(now-start)/1000,turn=smooth(.06,.50,p),zoom=smooth(.53,.96,p),intro=reduced?1:smooth(0,.6,elapsed);
  const openingTime=clamp(elapsed/2.4),opening=reduced?1:Math.pow(openingTime,4)*(5-4*openingTime),openAmount=Math.max(opening,smooth(0,.15,p));
  laptop.rotation.set(THREE.MathUtils.lerp(THREE.MathUtils.lerp(.15,.12,openAmount),0,turn),THREE.MathUtils.lerp(THREE.MathUtils.lerp(-1.08,-.42,openAmount),0,turn),THREE.MathUtils.lerp(THREE.MathUtils.lerp(-.09,-.055,openAmount),0,turn));
- laptop.rotation.y+=(reduced?0:px*.08)*(1-turn);laptop.rotation.x+=(reduced?0:py*.045)*(1-turn);
+ laptop.rotation.y+=(reduced?0:sx*.08)*(1-turn);laptop.rotation.x+=(reduced?0:sy*.045)*(1-turn);
  const tangent=Math.tan(THREE.MathUtils.degToRad(17.5)),startDistance=mobile?10.5:10.8,viewWidth=2*tangent*startDistance*camera.aspect,initialScale=Math.min(1.18,viewWidth*.36/4.7);
  laptop.scale.setScalar(THREE.MathUtils.lerp(initialScale,1,turn));
  laptop.position.set(THREE.MathUtils.lerp(viewWidth*.265,0,turn),THREE.MathUtils.lerp(mobile?-1.3:-.1,-.01,turn)-(1-intro)*.12,0);
@@ -145,8 +146,9 @@ let lastRenderKey='',lastNow=0;
 function frame(now){requestAnimationFrame(frame);if(document.hidden){lastNow=0;lastRenderAt=0;return;}
  const dt=lastNow?Math.min(.1,(now-lastNow)/1000):1/60;lastNow=now;
  const p=progress();updatePage(p);if(p>=1&&!reduced){lastRenderAt=0;return;}
+ if(reduced){sx=sy=0;}else{sx=THREE.MathUtils.damp(sx,px,6,dt);sy=THREE.MathUtils.damp(sy,py,6,dt);if(Math.abs(sx-px)<1e-4)sx=px;if(Math.abs(sy-py)<1e-4)sy=py;}
  const {openAmount,intro}=pose(now,p);updateScreen(now,p,dt);
- const renderKey=[p.toFixed(5),openAmount.toFixed(5),intro.toFixed(5),reduced?0:px.toFixed(4),reduced?0:py.toFixed(4),screenMix.toFixed(4),screenRevision].join(':');
+ const renderKey=[p.toFixed(5),openAmount.toFixed(5),intro.toFixed(5),sx.toFixed(4),sy.toFixed(4),screenMix.toFixed(4),screenRevision].join(':');
  if(renderDirty||renderKey!==lastRenderKey){renderer.render(scene,camera);lastRenderKey=renderKey;renderDirty=false;governFrameRate(now);}else lastRenderAt=0;
 }
 start=modeStarted=performance.now();document.body.classList.remove('booting');
