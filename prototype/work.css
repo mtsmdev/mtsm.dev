@@ -62,12 +62,13 @@ h1{font-size:clamp(60px,8.4vw,148px)}
 .timeline::before,.timeline::after{clip-path:inset(0 0 max(0px,calc(100% - var(--line-pen,100%))) 0);-webkit-mask:linear-gradient(transparent,#000 var(--spine-fade),#000 calc(100% - var(--spine-fade)),transparent);mask:linear-gradient(transparent,#000 var(--spine-fade),#000 calc(100% - var(--spine-fade)),transparent)}
 .timeline{--spine-fade:96px}
 @media(max-width:760px){.timeline{--spine-fade:64px}}
-.timeline::after{background:linear-gradient(var(--orange),#ff641b88);transform-origin:top;scale:1 0}
-@supports ((animation-timeline:view()) and (animation-range:0% 100%)){
- .timeline::after{animation:spine-fill linear both;animation-timeline:view();animation-range:cover 0% cover 85%}
-}
-@supports not ((animation-timeline:view()) and (animation-range:0% 100%)){.timeline::after{scale:1 1;opacity:.5}}
-@keyframes spine-fill{to{scale:1 1}}
+/* The orange part ends exactly at the current dot (portfolio.js sets --line-fill, in px from the spine's top). */
+.timeline::after{background:var(--orange);clip-path:inset(0 0 max(0px,calc(100% - min(var(--line-pen,100%),var(--line-fill,0px)))) 0)}
+/* The dot that is currently sticky pings softly and glows. */
+.tl-track .tl-node::after{content:'';position:absolute;inset:-2px;border-radius:50%;border:2px solid var(--orange);opacity:0;pointer-events:none}
+.tl-item.is-current .tl-track .tl-node{box-shadow:0 0 0 5px #ff641b2e,0 0 18px 3px #ff641b70}
+.tl-item.is-current .tl-track .tl-node::after{animation:node-ping 2s cubic-bezier(0,0,.2,1) infinite}
+@keyframes node-ping{0%{transform:scale(1);opacity:.75}70%,100%{transform:scale(2.8);opacity:0}}
 .tl-year{display:grid;grid-template-columns:var(--year-col) 1fr;column-gap:var(--gap);align-items:start;padding-bottom:clamp(40px,5vw,64px)}
 .tl-year[hidden]{display:none}
 .tl-year-label{position:sticky;top:var(--sticky-top);margin:0;font-family:'Barlow Condensed','Arial Narrow',sans-serif;font-weight:800;font-size:var(--label-fs);line-height:.9;letter-spacing:-.01em;font-variant-numeric:tabular-nums;color:transparent;-webkit-text-stroke:1px #ffffff40;transition:color .6s var(--ease-out),-webkit-text-stroke-color .6s}
@@ -157,7 +158,7 @@ span.tech-logo{background:var(--brand,var(--bone));-webkit-mask:var(--logo) cent
  .tl-track .tl-node{inset:auto;top:24px}
  .tl-node-icon{inset-inline-start:calc(var(--gap)*-1 - 6px);width:36px;height:36px}
 }
-@media(prefers-reduced-motion:reduce){.timeline::after{animation:none;scale:1 1}.tl-card,.tl-shot,.btn-primary::before{transition:none}.work-cue .icon{animation:none}}
+@media(prefers-reduced-motion:reduce){.tl-item.is-current .tl-track .tl-node::after{animation:none}.tl-card,.tl-shot,.btn-primary::before{transition:none}.work-cue .icon{animation:none}}
 
 /* ===== About and contact on the same scale ===== */
 .about>.eyebrow{display:none}

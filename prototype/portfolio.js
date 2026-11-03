@@ -187,7 +187,31 @@ function placeSpine(){
  timeline.style.setProperty('--spine-top',(centre(items[0])-fade).toFixed(1)+'px');
  const lastEnd=items[items.length-1].getBoundingClientRect().bottom-top;
  timeline.style.setProperty('--spine-bottom',(timeline.offsetHeight-lastEnd-fade).toFixed(1)+'px');
+ // For the orange part: where the spine starts, where the first dot rests, how far the last dot can go,
+ // and the height at which dots stick (from the dot's own sticky offset, so phone and desktop both work).
+ const node=timeline.querySelector('.tl-item:not([hidden]) .tl-track .tl-node');
+ spine={top:centre(items[0])-fade,first:centre(items[0]),end:lastEnd-7,line:node?parseFloat(getComputedStyle(node).top)+node.offsetHeight/2:innerHeight*.3};
+ fillLine();
 }
+// The orange part of the spine ends at the current dot: the first dot until it reaches its sticky spot,
+// then the sticky height itself, so it moves along with whichever dot is stuck there (and runs on through
+// the gaps between projects). That dot gets "is-current" for its ping.
+let spine=null,fillQueued=false,current=null;
+function fillLine(){
+ fillQueued=false;if(!spine)return;
+ const top=timeline.getBoundingClientRect().top;
+ if(top>innerHeight||top+timeline.offsetHeight<0)return;// off screen
+ const first=top+spine.first,end=first>spine.line?first:spine.line;
+ const fill=Math.max(0,Math.min(end-top,spine.end)-spine.top);
+ timeline.style.setProperty('--line-fill',fill.toFixed(1)+'px');
+ let now=null;
+ for(const node of timeline.querySelectorAll('.tl-item:not([hidden]) .tl-track .tl-node')){
+  const b=node.getBoundingClientRect();if(Math.abs(b.top+b.height/2-spine.line)<1.5){now=node.closest('.tl-item');break;}
+ }
+ if(now!==current){current?.classList.remove('is-current');now?.classList.add('is-current');current=now;}
+}
+const queueFill=()=>{if(!fillQueued){fillQueued=true;requestAnimationFrame(fillLine);}};
+addEventListener('scroll',queueFill,{passive:true});addEventListener('resize',()=>{placeSpine();queueFill();},{passive:true});
 if(timeline){new ResizeObserver(placeSpine).observe(timeline);addEventListener('timelinechange',placeSpine);document.fonts?.ready.then(placeSpine);placeSpine();}
 
 // Cards tilt a little toward the pointer, with the highlight following it.
