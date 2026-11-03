@@ -173,7 +173,8 @@ document.querySelector('.dock-item[data-section=top]')?.addEventListener('click'
 const lightUp=new IntersectionObserver(entries=>{for(const e of entries)e.target.classList.toggle('in-view',e.isIntersecting||e.boundingClientRect.top<0);},{rootMargin:'0px 0px -45% 0px'});
 document.querySelectorAll('.tl-item,.tl-year').forEach(el=>lightUp.observe(el));
 
-// The spine runs from a little before the first dot to a little after the last one, fading at both ends.
+// The spine fades in a little before the first dot and runs on to the end of the last card (so the last
+// dot rides the line until it stops), then fades out below it.
 const timeline=document.querySelector('.timeline');
 function placeSpine(){
  if(!timeline)return;
@@ -184,7 +185,8 @@ function placeSpine(){
  const centre=item=>{const track=item.querySelector('.tl-track');if(track){const node=track.firstElementChild;return track.getBoundingClientRect().top+parseFloat(getComputedStyle(node).marginTop)+node.offsetHeight/2-top;}const b=item.querySelector('.tl-node').getBoundingClientRect();return b.top+b.height/2-top;};
  const fade=parseFloat(getComputedStyle(timeline).getPropertyValue('--spine-fade'))||80;
  timeline.style.setProperty('--spine-top',(centre(items[0])-fade).toFixed(1)+'px');
- timeline.style.setProperty('--spine-bottom',(timeline.offsetHeight-centre(items[items.length-1])-fade).toFixed(1)+'px');
+ const lastEnd=items[items.length-1].getBoundingClientRect().bottom-top;
+ timeline.style.setProperty('--spine-bottom',(timeline.offsetHeight-lastEnd-fade).toFixed(1)+'px');
 }
 if(timeline){new ResizeObserver(placeSpine).observe(timeline);addEventListener('timelinechange',placeSpine);document.fonts?.ready.then(placeSpine);placeSpine();}
 
