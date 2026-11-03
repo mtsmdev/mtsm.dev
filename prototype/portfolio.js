@@ -2,8 +2,9 @@ const filters=document.querySelectorAll('[data-filter]');
 const projects=document.querySelectorAll('.tl-project');
 const laptopAction=document.getElementById('laptop-action'),primaryAction=document.querySelector('.hero .primary');
 // The last headline word cycles through what the code is made with, typed like in an editor.
+// "A>B" is the coffee joke: A is typed, struck through and shrunk, then B is typed after it.
 // The final word is Ihsan, which gets an explanatory tooltip.
-const wordsFor=()=>i18n.text().words.map((text,i,all)=>({text,tip:i===all.length-1}));
+const wordsFor=()=>i18n.text().words.map((w,i,all)=>{const [text,then]=w.split('>');return {text,then,tip:i===all.length-1};});
 const ihsanTip=document.getElementById('ihsan-tip'),heroCopy=document.querySelector('.hero-copy');
 let rotator=null;
 function startRotator(word,delay,headlineWords){
@@ -22,16 +23,39 @@ function startRotator(word,delay,headlineWords){
   if(on){word.tabIndex=0;word.setAttribute('aria-describedby','ihsan-tip');}
   else{word.removeAttribute('tabindex');word.removeAttribute('aria-describedby');}
  }
+ const typingDelay=()=>75+Math.random()*80;
  function erase(){
   if(tipOpen)return;
-  if(word.textContent===headlineWords[index].text){wrap.classList.add('typing');markTerm(false);}
+  wrap.classList.add('typing');markTerm(false);
+  const after=word.querySelector('.after');
+  if(after){// the joke: erase the second word, then let the struck one fade away
+   if(after.textContent.length){after.textContent=after.textContent.slice(0,-1);later(40+Math.random()*30,erase);return;}
+   word.querySelector('.struck')?.classList.add('gone');
+   later(320,()=>{word.textContent='';index=(index+1)%headlineWords.length;later(200,type);});return;
+  }
   if(word.textContent.length){word.textContent=word.textContent.slice(0,-1);later(40+Math.random()*30,erase);}
   else{index=(index+1)%headlineWords.length;later(260,type);}
  }
  function type(){
   const target=headlineWords[index],typed=word.textContent;
-  if(typed.length<target.text.length){word.textContent=target.text.slice(0,typed.length+1);later(75+Math.random()*80,type);return;}
+  if(typed.length<target.text.length){wrap.classList.add('typing');word.textContent=target.text.slice(0,typed.length+1);later(typingDelay(),type);return;}
+  finishWord(target);
+ }
+ // A word is fully typed: strike it (the joke), or hold it and move on.
+ function finishWord(target){
+  if(target.then&&!word.querySelector('.struck')){
+   wrap.classList.remove('typing');
+   const struck=document.createElement('span');struck.className='struck';struck.textContent=word.textContent;
+   const after=document.createElement('span');after.className='after';
+   word.replaceChildren(struck,after);
+   later(500,()=>{struck.classList.add('on');later(600,()=>{struck.classList.add('small');later(380,()=>typeAfter(target,after));});});
+   return;
+  }
   wrap.classList.remove('typing');markTerm(!!target.tip);later(target.tip?4500:2400,erase);
+ }
+ function typeAfter(target,after){
+  if(after.textContent.length<target.then.length){wrap.classList.add('typing');after.textContent=target.then.slice(0,after.textContent.length+1);later(typingDelay(),()=>typeAfter(target,after));return;}
+  wrap.classList.remove('typing');later(2600,erase);
  }
  word.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')openTip();});
  word.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')closeTip();});
@@ -40,7 +64,8 @@ function startRotator(word,delay,headlineWords){
  word.addEventListener('keydown',e=>{if(e.key==='Escape')closeTip();});
  const outside=e=>{if(tipOpen&&e.target!==word)closeTip();};document.addEventListener('pointerdown',outside);
  const reposition=()=>{if(tipOpen)placeTip();};addEventListener('resize',reposition,{passive:true});
- later(delay,erase);
+ // The first word is already on the page: finish it (strike it if it's the joke) before cycling.
+ later(delay,()=>finishWord(headlineWords[0]));
  return {stop(){clearTimeout(timer);closeTip(false);document.removeEventListener('pointerdown',outside);removeEventListener('resize',reposition);}};
 }
 function buildRotatingWord(content,headlineWords){

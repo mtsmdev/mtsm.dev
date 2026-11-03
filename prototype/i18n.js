@@ -16,7 +16,7 @@ const strings={
   'loader.label':'Loading workspace',
   'laptop.label':'My Dell XPS 15 9500. The lid opens by itself. Scroll to bring the laptop to the centre and see my projects through its screen.',
   'work.title':"What I build.",
-  'work.sub':"From my first Android experiments to full-fledged platforms.",
+  'work.sub':"From Android experiments to full-fledged platforms.",
   'work.now':"now",
   'work.cue':"Scroll through the timeline",
   'filters.label':"Filter projects",
@@ -83,7 +83,7 @@ const strings={
   't.achievement.kind':"Android app",
   't.achievement.body':"An early Android learning project: tick off fixed daily tasks and earn motivation points, with a weekly review.",
   'about.eyebrow':'ABOUT ME',
-  'about.title':'Curious.<br><em>With an eye for the user.</em>',
+  'about.title':'Curious.<br><em>Always learning, up for a challenge.</em>',
   'about.body':'I’m Moatasem Al-Refaai, a software developer. I mostly work with TypeScript frameworks and have a soft spot for UI/UX. I build multilingual interfaces that work in both reading directions (LTR and RTL), and I’m just as happy digging into APIs and databases. Right now I spend a lot of time on agentic coding.',
   'about.workLabel':'EXPERIENCE','about.work':'Freelance software developer<br>Nov 2025 – present',
   'about.eduLabel':'EDUCATION','about.eduName':'Software Engineering','about.edu':'Leiden University of Applied Sciences<br>Sep 2021 – Jun 2025',
@@ -104,7 +104,7 @@ const strings={
   'loader.label':'جارٍ تحميل مساحة العمل',
   'laptop.label':'حاسوبي Dell XPS 15 9500. يُفتح الغطاء تلقائيًا. مرّر الصفحة لينتقل الحاسوب إلى المنتصف وتستعرض مشاريعي عبر شاشته.',
   'work.title':"ما أبنيه.",
-  'work.sub':"من تجاربي الأولى على أندرويد إلى منصات متكاملة.",
+  'work.sub':"من تجارب على أندرويد إلى منصات متكاملة.",
   'work.now':"الآن",
   'work.cue':"مرّر عبر الخط الزمني",
   'filters.label':"تصفية المشاريع",
@@ -171,7 +171,7 @@ const strings={
   't.achievement.kind':"تطبيق أندرويد",
   't.achievement.body':"مشروع تعليمي مبكر على أندرويد: أنجز مهامك اليومية الثابتة واجمع نقاط التحفيز، مع مراجعة أسبوعية.",
   'about.eyebrow':'عنّي',
-  'about.title':'فضولي بطبعي.<br><em>والمستخدم أولًا.</em>',
+  'about.title':'فضولي بطبعي.<br><em>أتعلّم باستمرار وأحب التحدي.</em>',
   'about.body':'أنا معتصم الرفاعي، مطوّر برمجيات. أعمل غالبًا بأطر TypeScript، ولديّ شغف خاص بتصميم الواجهات وتجربة المستخدم. أبني واجهات متعددة اللغات تعمل في الاتجاهين (LTR وRTL)، وأستمتع بالقدر نفسه بالعمل على الـ APIs وقواعد البيانات. وأقضي هذه الأيام وقتًا طويلًا في البرمجة الوكيلة (agentic coding).',
   'about.workLabel':'الخبرة العملية','about.work':'مطوّر برمجيات مستقل<br>نوفمبر 2025 – حتى الآن',
   'about.eduLabel':'التعليم','about.eduName':'هندسة البرمجيات','about.edu':'جامعة لايدن للعلوم التطبيقية<br>سبتمبر 2021 – يونيو 2025',
@@ -186,17 +186,17 @@ const scriptStrings={
  nl:{
   hero:{button:'Bekijk mijn werk',headline:'CODE MET',label:'Bekijk mijn projecten'},
   privateMail:{subject:'Inzage in de code van {project}',body:'Hoi Moatasem,\n\nIk zou graag de code van {project} willen bekijken:\n{repos}\n\nGroet,'},
-  words:['KOFFIE','THEE','CHOCOMELK','IHSAN']
+  words:['KOFFIE>THEE','GEDULD','BETEKENIS','IHSAN']
  },
  en:{
   hero:{button:'View my work',headline:'CODE WITH',label:'View my projects'},
   privateMail:{subject:'Access to the {project} code',body:'Hi Moatasem,\n\nI’d like to take a look at the code for {project}:\n{repos}\n\nBest regards,'},
-  words:['COFFEE','TEA','COCOA','IHSAN']
+  words:['COFFEE>TEA','PATIENCE','PURPOSE','IHSAN']
  },
  ar:{
   hero:{button:'شاهد أعمالي',headline:'برمجة',label:'استعرض مشاريعي'},
   privateMail:{subject:'طلب الاطلاع على شيفرة {project}',body:'مرحبًا معتصم،\n\nأودّ الاطلاع على شيفرة {project}:\n{repos}\n\nمع التحية،'},
-  words:['بالقهوة','بالشاي','بالكاكاو','بإحسان']
+  words:['بالقهوة>بالشاي','بصبر','بهدف','بإحسان']
  }
 };
 const supported=Object.keys(scriptStrings);
