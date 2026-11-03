@@ -388,7 +388,7 @@ function governFrameRate(now){
 
 let sx=0,sy=0;// pointer position eased so parallax glides instead of stepping with each event
 function pose(now,p){
- const elapsed=(now-start)/1000,turn=smooth(.06,.50,p),zoom=smooth(.53,.96,p),intro=reduced?1:smooth(0,.6,elapsed);
+ const elapsed=(now-start)/1000,turn=smooth(.06,.50,p),zoom=smooth(.06,.96,p),intro=reduced?1:smooth(0,.6,elapsed);
  const openingTime=clamp(elapsed/2.4),opening=reduced?1:Math.pow(openingTime,4)*(5-4*openingTime),openAmount=Math.max(opening,smooth(0,.15,p));
  laptop.rotation.set(THREE.MathUtils.lerp(THREE.MathUtils.lerp(.15,.12,openAmount),0,turn),THREE.MathUtils.lerp(THREE.MathUtils.lerp(-1.08,-.42,openAmount),0,turn)*side,THREE.MathUtils.lerp(THREE.MathUtils.lerp(-.09,-.055,openAmount),0,turn)*side);
  // Pointer tilt (about ±10° of yaw) plus any grab-and-spin offset; both fade out as the laptop turns to the page.
@@ -399,10 +399,11 @@ function pose(now,p){
  else{startScale=landScale;startX=landX;startY=landY;}
  laptop.scale.setScalar(THREE.MathUtils.lerp(startScale,1,turn));
  laptop.position.set(THREE.MathUtils.lerp(startX,0,turn),THREE.MathUtils.lerp(startY,-.01,turn)-(1-intro)*.12,0);
- // Landscape zooms until the screen covers the view; portrait fits the screen's width instead of cropping it.
+ // The camera closes in over the whole journey (one movement: bigger while turning to the centre, then on
+ // into the screen). Landscape zooms until the screen covers the view; portrait fits the screen's width.
  // The camera ends centred on the screen at the distance where it exactly fills the page width.
  const c=finalScreen.center,lerp=THREE.MathUtils.lerp;
- camera.position.set(lerp(0,c.x,turn),lerp(.65,c.y,turn),lerp(startDistance,fitDistance(),portrait?turn:zoom));camera.lookAt(lerp(0,c.x,turn),lerp(-.01,c.y,turn),lerp(-.25,c.z,turn));
+ camera.position.set(lerp(0,c.x,turn),lerp(.65,c.y,turn),lerp(startDistance,fitDistance(),zoom));camera.lookAt(lerp(0,c.x,turn),lerp(-.01,c.y,turn),lerp(-.25,c.z,turn));
  lid.rotation.x=THREE.MathUtils.lerp(THREE.MathUtils.degToRad(99.6)*(1-openAmount),finalLid,turn);
  return {openAmount,intro};
 }
