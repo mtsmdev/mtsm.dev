@@ -35,4 +35,4 @@ Projecten is the default view. Mijn CV displays the CV on the laptop and opens t
 
 The renderer caches static screens, reduces resolution during motion, and restores sharpness when movement settles. Reduced-motion preferences are respected.
 
-See [asset sources](docs/ASSETS.md) for third-party attributions. Deployment to mtsm.dev is a separate step; pushing this repository does not publish the website.
+See [asset sources](docs/ASSETS.md) for third-party attributions. GitHub Pages deploys the static build automatically after a successful push to `main`. The configured custom domain is `mtsm.dev`. See [hosting details](docs/HOSTING.md).
