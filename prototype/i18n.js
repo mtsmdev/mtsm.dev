@@ -63,6 +63,67 @@ const strings={
   'about.langLabel':'LANGUAGES','about.langs':'Dutch · English · Arabic','about.langNote':'Which is why I also build interfaces that read right to left.',
   'about.cvLink':'CV (PDF) ↗',
   'footer.eyebrow':'WANT TO WORK TOGETHER?','footer.cta':'LET’S BUILD<br>SOMETHING<span>↗</span>','footer.name':'MOATASEM AL-REFAAI'
+ },
+ ar:{
+  'meta.title':'معتصم الرفاعي — مطوّر برمجيات',
+  'meta.description':'معرض أعمال معتصم الرفاعي، مطوّر برمجيات. تطبيقات ويب وأندرويد وتصميم واجهات وتجربة مستخدم، من الواجهة الأمامية حتى الـ API.',
+  'lang.label':'اختر اللغة',
+  'brand.label':'معتصم الرفاعي، العودة إلى الأعلى','brand.name':'معتصم<br>الرفاعي',
+  'nav.label':'التنقل الرئيسي','nav.work':'المشاريع','nav.cv':'سيرتي الذاتية','nav.contact':'تواصل',
+  'hero.label':'مقدمة',
+  'hero.eyebrow':'مطوّر برمجيات <span>×</span> UI / UX',
+  'hero.ihsan':'<strong>الإحسان</strong> أن تؤدي عملك على أحسن وجه، بإتقان وعناية، حتى حين لا يراك أحد. وهكذا أحب أن أبني.',
+  'hero.intro':'أهلًا، أنا معتصم. أبني تطبيقات ويب تعمل بكفاءة ويسهل استخدامها، من الواجهة الأمامية حتى الـ API.',
+  'hero.annotation':'<span class="status-light"></span>مساحة عملي / <bdi>XPS 15 9500</bdi><div class="fine"><bdi>VS CODE</bdi> · <bdi>TYPESCRIPT</bdi> · قهوة كثيرة</div>',
+  'laptop.label':'حاسوبي Dell XPS 15 9500. يُفتح الغطاء تلقائيًا. مرّر الصفحة لينتقل الحاسوب إلى المنتصف وتستعرض مشاريعي عبر شاشته.',
+  'work.eyebrow':'المشاريع','work.platforms':'ويب · موبايل · سطح المكتب',
+  'work.title':'أعمال<br><span>مختارة.</span>',
+  'work.intro':'بعض المشاريع التي أفخر بها، من محاكي للطاقة إلى منصة اجتماعية. في كل مشروع تجد ما يقدّمه والتقنيات التي بُني بها.',
+  'case.tech':'التقنيات المستخدمة',
+  'link.demo':'عرض مباشر ↗','link.website':'الموقع ↗','link.ghFrontend':'GitHub: الواجهة الأمامية ↗','link.ghBackend':'GitHub: الواجهة الخلفية ↗',
+  'case1.kind':'تطبيق ويب',
+  'case1.lead':'ماذا يتغيّر حين تستخدم الطاقة بذكاء أكبر؟',
+  'case1.body':'حاكِ الألواح الشمسية والبطارية المنزلية وشحن السيارة الكهربائية وتسخين المياه في لوحة تحكم واحدة. سترى فورًا أثر الطقس وإعداداتك وجدولك على تدفّق الطاقة وعلى ما توفّره.',
+  'case1.f1':'الألواح الشمسية والبطارية المنزلية والسيارة الكهربائية والمياه الساخنة في محاكاة واحدة',
+  'case1.f2':'ترى فورًا أثر الطقس والتخطيط',
+  'case1.f3':'بُني باستخدام Codex عبر البرمجة الوكيلة (agentic coding)',
+  'case1.open':'افتح العرض التجريبي لـ ThermaVoltFlow',
+  'case1.alt':'لقطة شاشة للوحة تحكم ThermaVoltFlow مع محاكاة الطاقة.',
+  'case1.caption':'لقطة شاشة من مستودع GitHub',
+  'case2.kind':'ويب + أندرويد',
+  'case2.lead':'منصة اجتماعية، من الواجهة الأمامية حتى الخلفية.',
+  'case2.body':'تطبيق ويب وأندرويد فيه حسابات وملفات شخصية ودردشة وتفاعلات ومجموعات. بُني باستخدام React وFirebase وReact Query وCloudflare Workers.',
+  'case2.backendLabel':'الواجهة الخلفية',
+  'case2.backend':'وبنيتُ أيضًا واجهة خلفية مستقلة بـ Java Spring Boot، مع PostgreSQL وREST API وترحيلات Flyway وRedis وOpenAPI وDocker.',
+  'case2.open':'افتح Amposter',
+  'case2.altWeb':'تطبيق Amposter على الويب مع الخط الزمني والرسائل والمجموعات.',
+  'case2.altChat':'شاشة الدردشة في تطبيق Amposter على أندرويد.',
+  'case2.altProfile':'شاشة الملف الشخصي في تطبيق Amposter على أندرويد.',
+  'case2.phones':'من الويب<br>إلى أندرويد.<small>React · Firebase · Java</small>',
+  'case2.caption':'ويب وأندرويد · لقطات شاشة من سيرتي الذاتية',
+  'archive.eyebrow':'مشاريع أخرى','archive.title':'مشاريع أصغر وأعمال دراسية.',
+  'filters.label':'تصفية المشاريع',
+  'filter.all':'الكل <span>8</span>','filter.web':'ويب <span>3</span>','filter.mobile':'موبايل <span>2</span>','filter.desktop':'سطح المكتب <span>3</span>',
+  'kind.desktop':'سطح المكتب','kind.webDesktop':'ويب + سطح المكتب','kind.multiplayer':'متعدد اللاعبين','kind.quiz':'اختبار','kind.mobile':'موبايل','kind.web':'ويب',
+  'p03.body':'تطبيق لنظام Windows يجلب مواقيت الصلاة في الخلفية ويشغّل تنبيهًا صوتيًا في موعدها. مع تخزين مؤقت محلي ومعالجة للأخطاء وتسجيل للأحداث.',
+  'p04.name':'إدارة محطات الشحن<small>Angular · TypeScript · Spring Boot</small>',
+  'p04.body':'مشروع دراسي لإدارة محطات شحن السيارات الكهربائية: واجهة Angular فيها تسجيل دخول وإنشاء حساب وشاشات للمستخدمين والمشرفين وعرض للمواقع. تعمل على REST API مبنية بـ Spring Boot، وإلى جانبها تطبيق JavaFX.',
+  'p05.body':'لعبة Monopoly متعددة اللاعبين، طوّرناها في فريق من أربعة. في تطبيق JavaFX تلعب بالدور وتشتري الشوارع وتدفع الإيجار، ويحافظ Firestore على تزامن حالة اللعبة بين اللاعبين.',
+  'p06.name':'قبعة الفرز<small>Python · Pygame</small>',
+  'p06.body':'اختبار يساعد الطلاب على اختيار تخصصهم. يمكن استخدامه بالكامل من لوحة المفاتيح، وتظهر النتيجة في النهاية.',
+  'p07.body':'تطبيق أندرويد للبحث عن أرقام E للمضافات الغذائية، مع شرح لكل مكوّن ورمز لوني ووضعين فاتح وداكن.',
+  'p08.body':'مشروع تعليمي على أندرويد: أنجز مهامك اليومية الثابتة واجمع النقاط. مع وضعين فاتح وداكن.',
+  'p09.body':'موقع لمحبي اللعبة، فيه متجر تجريبي وعرض للمركبات والخرائط والإصدارات.',
+  'p10.name':'تطبيق ويب لمطعم<small>HTML · CSS · JavaScript</small>',
+  'p10.body':'مشروع دراسي: قائمة طعام مع بحث ومفضّلة وخطوات طلب تنتهي بدفع تجريبي.',
+  'about.eyebrow':'عنّي',
+  'about.title':'شغوف بالتعلّم.<br><em>والمستخدم أولًا.</em>',
+  'about.body':'أنا معتصم الرفاعي، مطوّر برمجيات. أعمل غالبًا بأطر TypeScript، ولديّ شغف خاص بتصميم الواجهات وتجربة المستخدم. أبني واجهات متعددة اللغات تعمل في الاتجاهين (LTR وRTL)، وأستمتع بالقدر نفسه بالعمل على الـ APIs وقواعد البيانات. وأقضي هذه الأيام وقتًا طويلًا في البرمجة الوكيلة (agentic coding).',
+  'about.workLabel':'الخبرة العملية','about.work':'مطوّر برمجيات مستقل<br>نوفمبر 2025 – حتى الآن',
+  'about.eduLabel':'التعليم','about.eduName':'هندسة البرمجيات','about.edu':'جامعة لايدن للعلوم التطبيقية<br>سبتمبر 2021 – يونيو 2025',
+  'about.langLabel':'اللغات','about.langs':'الهولندية · الإنجليزية · العربية','about.langNote':'لذلك أبني واجهات تعمل بسلاسة من اليمين إلى اليسار أيضًا.',
+  'about.cvLink':'السيرة الذاتية (PDF) ↗',
+  'footer.eyebrow':'هل نعمل معًا؟','footer.cta':'لنبنِ<br>شيئًا معًا<span>↗</span>','footer.name':'معتصم الرفاعي'
  }
 };
 // Copy that scripts render (buttons, headline, counters), in every language.
@@ -84,6 +145,15 @@ const scriptStrings={
   },
   words:['COFFEE','TEA','COCOA','IHSAN'],
   projects:{one:'# project',other:'# projects'}
+ },
+ ar:{
+  mode:{
+   work:{button:'شاهد أعمالي',headline:'برمجة',label:'استعرض مشاريعي'},
+   cv:{button:'اطّلع على سيرتي',headline:['معتصم','الرفاعي'],label:'افتح سيرتي الذاتية كاملة بصيغة PDF'},
+   contact:{button:'راسلني',headline:['لنتحدث','معًا'],label:'أرسل بريدًا إلى career@mtsm.dev'}
+  },
+  words:['بالقهوة','بالشاي','بالكاكاو','بإحسان'],
+  projects:{zero:'لا مشاريع',one:'مشروع واحد',two:'مشروعان',few:'# مشاريع',many:'# مشروعًا',other:'# مشروع'}
  }
 };
 const supported=Object.keys(scriptStrings);
@@ -107,6 +177,10 @@ function apply(lang){
  for(const el of document.querySelectorAll('[data-i18n-label]'))el.setAttribute('aria-label',t(el.dataset.i18nLabel));
  for(const el of document.querySelectorAll('[data-i18n-alt]'))el.setAttribute('alt',t(el.dataset.i18nAlt));
  for(const link of document.querySelectorAll('[data-lang]'))link.setAttribute('aria-current',String(link.dataset.lang===lang));
+ // External-link arrows point the reading direction: ↗ in LTR, ↖ in RTL.
+ const [from,to]=lang==='ar'?['↗','↖']:['↖','↗'];
+ const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+ for(let node;(node=walker.nextNode());)if(node.nodeValue.includes(from))node.nodeValue=node.nodeValue.split(from).join(to);
  const code=document.querySelector('.lang-current');if(code)code.textContent=lang.toUpperCase();
  window.dispatchEvent(new CustomEvent('i18nchange',{detail:lang}));
 }

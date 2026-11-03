@@ -14,7 +14,8 @@ function startRotator(word,delay,headlineWords){
  const later=(ms,next)=>{clearTimeout(timer);timer=setTimeout(next,ms);};
  function placeTip(){
   const box=word.getBoundingClientRect(),copy=heroCopy.getBoundingClientRect();
-  const left=Math.min(box.left,innerWidth-16-ihsanTip.offsetWidth)-copy.left;
+  const rtl=document.documentElement.dir==='rtl',start=rtl?box.right-ihsanTip.offsetWidth:box.left;// align with the word's reading start
+  const left=Math.min(start,innerWidth-16-ihsanTip.offsetWidth)-copy.left;
   ihsanTip.style.left=Math.max(16-copy.left,left)+'px';ihsanTip.style.top=(box.bottom-copy.top+12)+'px';
  }
  function openTip(){if(!word.classList.contains('is-term'))return;clearTimeout(timer);tipOpen=true;openedAt=performance.now();placeTip();ihsanTip.classList.add('open');}

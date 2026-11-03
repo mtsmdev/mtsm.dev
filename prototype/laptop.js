@@ -128,7 +128,13 @@ function resize(){
 // box are projected through the starting camera, so perspective is accounted for exactly.
 const fitBox=new THREE.Box3(),fitCam=new THREE.PerspectiveCamera(35,1,.03,100),corner=new THREE.Vector3();
 let fitScale=1,fitX=0,fitY=0;
-laptop.rotation.set(.12,-.42,-.055);lid.rotation.x=0;laptop.updateMatrixWorld(true);fitBox.setFromObject(laptop);
+// Right-to-left pages put the text on the right, so the laptop mirrors to the left side.
+let side=document.documentElement.dir==='rtl'?-1:1;
+function measureLaptop(){
+ laptop.rotation.set(.12,-.42*side,-.055*side);laptop.scale.setScalar(1);laptop.position.set(0,0,0);lid.rotation.x=0;
+ laptop.updateMatrixWorld(true);fitBox.setFromObject(laptop);
+}
+measureLaptop();
 function fitPortrait(w,h){
  const distance=mobile?10.5:10.8,perPx=2*Math.tan(THREE.MathUtils.degToRad(17.5))*distance/h;
  fitCam.aspect=w/h;fitCam.updateProjectionMatrix();fitCam.position.set(0,.65,distance);fitCam.lookAt(0,-.01,-.25);fitCam.updateMatrixWorld();
@@ -150,6 +156,7 @@ function fitPortrait(w,h){
  }
 }
 const layoutObserver=new ResizeObserver(resize);layoutObserver.observe(host);layoutObserver.observe(heroCopy);resize();
+window.addEventListener('i18nchange',()=>{side=document.documentElement.dir==='rtl'?-1:1;measureLaptop();resize();});
 let sampled=0,slow=0,lastRenderAt=0;
 function governFrameRate(now){
  const gap=lastRenderAt?now-lastRenderAt:0;lastRenderAt=now;
@@ -164,12 +171,12 @@ let sx=0,sy=0;// pointer position eased so parallax glides instead of stepping w
 function pose(now,p){
  const elapsed=(now-start)/1000,turn=smooth(.06,.50,p),zoom=smooth(.53,.96,p),intro=reduced?1:smooth(0,.6,elapsed);
  const openingTime=clamp(elapsed/2.4),opening=reduced?1:Math.pow(openingTime,4)*(5-4*openingTime),openAmount=Math.max(opening,smooth(0,.15,p));
- laptop.rotation.set(THREE.MathUtils.lerp(THREE.MathUtils.lerp(.15,.12,openAmount),0,turn),THREE.MathUtils.lerp(THREE.MathUtils.lerp(-1.08,-.42,openAmount),0,turn),THREE.MathUtils.lerp(THREE.MathUtils.lerp(-.09,-.055,openAmount),0,turn));
+ laptop.rotation.set(THREE.MathUtils.lerp(THREE.MathUtils.lerp(.15,.12,openAmount),0,turn),THREE.MathUtils.lerp(THREE.MathUtils.lerp(-1.08,-.42,openAmount),0,turn)*side,THREE.MathUtils.lerp(THREE.MathUtils.lerp(-.09,-.055,openAmount),0,turn)*side);
  laptop.rotation.y+=(reduced?0:sx*.08)*(1-turn);laptop.rotation.x+=(reduced?0:sy*.045)*(1-turn);
  const tangent=Math.tan(THREE.MathUtils.degToRad(17.5)),startDistance=mobile?10.5:10.8,viewHeight=2*tangent*startDistance,viewWidth=viewHeight*camera.aspect;
  let startScale,startX,startY;
  if(portrait){startScale=fitScale;startX=fitX;startY=fitY;}
- else{startScale=Math.min(innerHeight<520?.78:.95,viewWidth*.36/4.7);startX=viewWidth*.265;startY=mobile?-1.3:innerHeight<520?-.35:-.1;}// short landscape: clear the header
+ else{startScale=Math.min(innerHeight<520?.78:.95,viewWidth*.36/4.7);startX=viewWidth*.265*side;startY=mobile?-1.3:innerHeight<520?-.35:-.1;}// short landscape: clear the header
  laptop.scale.setScalar(THREE.MathUtils.lerp(startScale,1,turn));
  laptop.position.set(THREE.MathUtils.lerp(startX,0,turn),THREE.MathUtils.lerp(startY,-.01,turn)-(1-intro)*.12,0);
  // Landscape zooms until the screen covers the view; portrait fits the screen's width instead of cropping it.

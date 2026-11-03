@@ -139,3 +139,45 @@ footer{padding-bottom:70px}
 .lang-menu a:hover,.lang-menu a:focus-visible{background:#2a2925;color:#fff}
 .lang-menu a[aria-current=true]{color:var(--orange)}
 @media(max-width:600px){.brand-name{display:none}.lang-menu summary{min-height:36px;padding:0 10px}}
+
+/* Arabic typography: Alexandria for display type, IBM Plex Sans Arabic for text.
+   Arabic letters connect, so letter-spacing always stays at 0. */
+html[lang=ar] body,html[lang=ar] body *{font-family:'IBM Plex Sans Arabic','DM Sans',Arial,sans-serif!important;letter-spacing:0!important}
+html[lang=ar] :is(h1,h2,h3,footer>a),html[lang=ar] :is(h1,h2,h3,footer>a) *{font-family:'Alexandria','IBM Plex Sans Arabic',sans-serif!important}
+html[lang=ar] h1{font-size:clamp(60px,7.2vw,124px);line-height:1.22;font-weight:800}
+html[lang=ar] h2{line-height:1.25}
+html[lang=ar] .line{padding-bottom:.06em}
+html[lang=ar] .line:has(.word-wrap){padding-bottom:.3em;margin-bottom:-.24em}
+html[lang=ar] .work .work-heading h2{font-size:clamp(48px,5.6vw,84px);line-height:1.2}
+html[lang=ar] footer>a{font-size:clamp(52px,8vw,118px);line-height:1.2}
+html[lang=ar] .about h2{font-size:clamp(34px,4.6vw,64px);line-height:1.35}
+html[lang=ar] .intro,html[lang=ar] .case-copy>p,html[lang=ar] .work-heading>p,html[lang=ar] .about p:not(.eyebrow){line-height:1.9}
+html[lang=ar] .eyebrow,html[lang=ar] .case-kicker,html[lang=ar] .annotation{font-weight:600}
+html[lang=ar] .word.is-term{text-underline-offset:.28em}
+@media(max-width:600px){html[lang=ar] h1{font-size:15vw}html[lang=ar] .work .work-heading h2{font-size:13vw}html[lang=ar] footer>a{font-size:15vw}}
+
+/* Right-to-left layout: mirror the physical offsets the base styles use. */
+[dir=rtl] .logo{direction:ltr}
+[dir=rtl] .scroll-journey .hero-copy,[dir=rtl] .hero-copy{padding-left:0;padding-right:4%}
+[dir=rtl] .annotation{right:auto;left:5%}
+[dir=rtl] .status-light{margin-right:0;margin-left:8px}
+[dir=rtl] .fine{margin:10px 15px 0 0}
+[dir=rtl] .caret{margin-left:0;margin-right:.05em}
+[dir=rtl] .work-heading>p{margin:0 auto 4px 0}
+[dir=rtl] .feature-list li{padding-left:0;padding-right:18px}
+[dir=rtl] .feature-list li:before{left:auto;right:0;content:'↖'}
+[dir=rtl] .backend-note{border-left:0;border-right:2px solid #b99b80;padding-left:0;padding-right:14px}
+[dir=rtl] .amposter-phones>span{padding:0 5px 20px 0}
+[dir=rtl] .project-kind{text-align:left}
+[dir=rtl] .filter-count{margin-left:0;margin-right:auto}
+[dir=rtl] .project-filters button span{margin-left:0;margin-right:8px}
+[dir=rtl] .archive-body{padding:0 27px 22px 5px}
+[dir=rtl] footer>a>span{right:auto;left:0}
+@media(max-aspect-ratio:9/10){[dir=rtl] .scroll-journey .annotation{left:auto;right:5%}}
+@media(max-width:700px){[dir=rtl] .work-heading>p{margin:23px 0 0}}
+/* Arabic letterforms need a little more size than Latin to read as clearly at label sizes. */
+html[lang=ar] :is(.eyebrow,.case-kicker,.profile-facts small,.section-top>span,.archive-heading .eyebrow,.backend-note>span,.project-kind,.filter-count,.case-visual figcaption,.annotation){font-size:12px}
+html[lang=ar] :is(.annotation .fine,.skills,footer>div,.amposter-phones small){font-size:12px}
+html[lang=ar] .about .profile-facts p,html[lang=ar] .archive-body p,html[lang=ar] .backend-note>p,html[lang=ar] .feature-list{font-size:13px}
+html[lang=ar] .brand{font-size:12px}
+[dir=rtl] footer>div>[dir=ltr]{text-align:right}
