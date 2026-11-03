@@ -202,6 +202,8 @@ let panelTop=0,panelW=1,panelH=1,panelShown=true;
 // position on screen, and when the journey ends the hero scrolls away taking it along, exactly
 // where the section expects it. Without WebGL or with reduced motion it stays in the section.
 if(!reduced){panel.style.opacity='0';hero.append(panel);document.body.classList.add('journey-on');}
+// For printing (print.css) the panel goes back to the top of its section, then returns.
+if(!reduced){addEventListener('beforeprint',()=>work.prepend(panel));addEventListener('afterprint',()=>hero.append(panel));}
 function layoutPanel(){
  // The panel's place in the page: full width, centred on the viewport, exactly where the screen ends up.
  panelW=host.clientWidth;panelH=panelW/screenAspect;panelTop=(host.clientHeight-panelH)/2;
