@@ -222,3 +222,15 @@ html[lang=ar] .contact h2{font-size:clamp(44px,6.4vw,104px);line-height:1.2}
 .contact-foot{max-width:1240px;margin:clamp(56px,7vw,96px) auto 0;padding-top:24px;border-top:1px solid var(--line);font-size:var(--fs-small);color:var(--muted-2)}
 @media(max-width:900px){.contact-cards{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.contact-card{transition:none}}
+
+/* ===== Ruler-to-timeline morph (morph.js) ===== */
+.morph-layer{position:fixed;inset:0;z-index:6;pointer-events:none;visibility:hidden}
+.morph-layer.on{visibility:visible}
+.morph-dot,.morph-year{position:absolute;top:0;left:0;will-change:transform}
+.morph-dot{border-radius:50%;background:var(--orange);box-shadow:0 0 0 6px #ff641b22}
+.morph-year{transform-origin:0 0;color:var(--bone);white-space:nowrap;font-variant-numeric:tabular-nums}
+.work-ruler li{transition:none}
+/* Filter chips: rise, turn and fade in one by one. */
+.project-filters.chips-ready button{opacity:0;translate:0 22px;rotate:-5deg;transition:opacity .6s var(--ease-out),translate .8s var(--ease-out),rotate .8s var(--ease-out),background .25s,color .25s,border-color .25s;transition-delay:calc(var(--i,0)*90ms),calc(var(--i,0)*90ms),calc(var(--i,0)*90ms),0s,0s,0s}
+[dir=rtl] .project-filters.chips-ready button{rotate:5deg}
+.project-filters.chips-in button{opacity:1;translate:0 0;rotate:0deg}
