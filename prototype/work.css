@@ -30,7 +30,7 @@ h1{font-size:clamp(60px,8.4vw,148px)}
    A 16:10 slide the size of the laptop screen. Its type scales with the panel (cqw), so it looks
    the same on the laptop screen as it does once it fills the page. */
 .work{padding:0;background:transparent;color:var(--bone)}
-.work-screen{container-type:inline-size;position:relative;width:100%;aspect-ratio:var(--screen-aspect,1.6);overflow:hidden;background:radial-gradient(60% 70% at 85% 10%,#ff641b26,transparent 70%),radial-gradient(50% 60% at 0% 100%,#ff641b12,transparent 70%),#13120f;transform-origin:0 0}
+.work-screen{container-type:inline-size;position:relative;width:100%;aspect-ratio:var(--screen-aspect,1.6);overflow:hidden;background:radial-gradient(60% 70% at 85% 10%,#ff641b26,transparent 70%),#13120f;transform-origin:0 0}
 .work-screen::before{content:'';position:absolute;inset:0;background-image:linear-gradient(#ffffff08 1px,transparent 1px),linear-gradient(90deg,#ffffff08 1px,transparent 1px);background-size:6cqw 6cqw;-webkit-mask:radial-gradient(80% 80% at 70% 30%,#000,transparent);mask:radial-gradient(80% 80% at 70% 30%,#000,transparent)}
 .work-screen-inner{position:relative;height:100%;display:flex;flex-direction:column;justify-content:center;padding:0 7cqw;gap:2.4cqw}
 .work .work-screen h2{margin:0;font-size:12.5cqw;line-height:.86;letter-spacing:-.02em;text-wrap:balance}
@@ -166,3 +166,6 @@ footer.contact>div{font:400 15px 'DM Sans',Arial,sans-serif;align-items:center;g
 .work .project-filters button span{font:inherit;margin:0;color:inherit}
 .work .project-filters .filter-n{font-size:13px;opacity:.7}
 .work .filter-count{font-family:'DM Sans',Arial,sans-serif}
+/* During the laptop journey the panel sits where the screen ends up: centred on the viewport. */
+.work-screen{margin-top:var(--panel-offset,0px);will-change:transform,opacity}
+.reduced .work-screen,.no-webgl .work-screen{margin-top:0;will-change:auto}
