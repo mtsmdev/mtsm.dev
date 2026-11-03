@@ -130,14 +130,37 @@ addEventListener('scroll',()=>{if(!spyQueued){spyQueued=true;requestAnimationFra
 addEventListener('resize',spy,{passive:true});spy();
 // Dock 'Start' returns to the top of the hero.
 document.querySelector('.dock-item[data-section=top]')?.addEventListener('click',event=>{event.preventDefault();stopJourney();scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});history.replaceState(null,'',location.pathname+location.search);});
-// Cards light up where the pointer is (a radial highlight that follows it).
-document.querySelector('.timeline')?.addEventListener('pointermove',event=>{
- const card=event.target.closest('.tl-card');if(!card||event.pointerType==='touch')return;
- const box=card.getBoundingClientRect();
- card.style.setProperty('--mx',((event.clientX-box.left)/box.width*100).toFixed(1)+'%');
- card.style.setProperty('--my',((event.clientY-box.top)/box.height*100).toFixed(1)+'%');
-},{passive:true});
-
 // Timeline items and years light up as they pass through the middle of the screen.
 const lightUp=new IntersectionObserver(entries=>{for(const e of entries)e.target.classList.toggle('in-view',e.isIntersecting||e.boundingClientRect.top<0);},{rootMargin:'0px 0px -45% 0px'});
 document.querySelectorAll('.tl-item,.tl-year').forEach(el=>lightUp.observe(el));
+
+// The spine starts at the first dot and ends at the last visible one.
+const timeline=document.querySelector('.timeline');
+function placeSpine(){
+ if(!timeline)return;
+ const items=[...timeline.querySelectorAll('.tl-item')].filter(i=>i.offsetParent!==null);
+ if(!items.length)return;
+ const top=timeline.getBoundingClientRect().top;
+ // A project dot's resting place is the top of its track (sticky moves it later); milestones are centred.
+ const centre=item=>{const track=item.querySelector('.tl-track');if(track){const node=track.firstElementChild;return track.getBoundingClientRect().top+parseFloat(getComputedStyle(node).marginTop)+node.offsetHeight/2-top;}const b=item.querySelector('.tl-node').getBoundingClientRect();return b.top+b.height/2-top;};
+ timeline.style.setProperty('--spine-top',centre(items[0]).toFixed(1)+'px');
+ timeline.style.setProperty('--spine-bottom',(timeline.offsetHeight-centre(items[items.length-1])).toFixed(1)+'px');
+}
+if(timeline){new ResizeObserver(placeSpine).observe(timeline);addEventListener('timelinechange',placeSpine);document.fonts?.ready.then(placeSpine);placeSpine();}
+
+// Cards tilt a little toward the pointer, with the highlight following it.
+if(matchMedia('(hover: hover) and (pointer: fine)').matches&&!matchMedia('(prefers-reduced-motion: reduce)').matches){
+ let tilted=null;
+ const reset=card=>{card.style.transform='';};
+ addEventListener('pointermove',event=>{
+  const card=event.target instanceof Element?event.target.closest('.tl-card,.contact-card'):null;
+  if(tilted&&tilted!==card){reset(tilted);tilted=null;}
+  if(!card)return;
+  const box=card.getBoundingClientRect(),x=(event.clientX-box.left)/box.width,y=(event.clientY-box.top)/box.height;
+  const max=card.classList.contains('contact-card')?7:3;// big project cards tilt less
+  card.style.setProperty('--mx',(x*100).toFixed(1)+'%');card.style.setProperty('--my',(y*100).toFixed(1)+'%');
+  card.style.transform=`perspective(1100px) rotateX(${((.5-y)*max*1.6).toFixed(2)}deg) rotateY(${((x-.5)*max*2).toFixed(2)}deg)`;
+  tilted=card;
+ },{passive:true});
+ document.addEventListener('pointerleave',()=>{if(tilted){reset(tilted);tilted=null;}});
+}
