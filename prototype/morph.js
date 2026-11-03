@@ -51,7 +51,7 @@ function source(){
  const li=srcItem,frame=ruler.offsetParent.getBoundingClientRect();
  const ox=li.offsetLeft+srcDot.offsetLeft+srcDot.offsetWidth/2,oy=li.offsetTop+srcDot.offsetTop+srcDot.offsetHeight/2;
  return {originX:ox,x:frame.left+ruler.offsetLeft+ox,y:frame.top+ruler.offsetTop+oy,size:srcDot.offsetWidth,
-  rel:{x:li.offsetLeft+srcLabel.offsetLeft-ox,y:li.offsetTop+srcLabel.offsetTop-oy},fontSize:parseFloat(getComputedStyle(srcLabel).fontSize)};
+  rel:{x:srcLabel.getBoundingClientRect().left-(frame.left+ruler.offsetLeft+ox),y:li.offsetTop+srcLabel.offsetTop+srcLabel.offsetHeight/2-oy},fontSize:parseFloat(getComputedStyle(srcLabel).fontSize)};
 }
 function setSources(o){srcDot.style.opacity=srcLabel.style.opacity=o;}
 function setTargets(o,node,label=o){tgtLabel.style.opacity=label;if(node)node.style.opacity=o;}
@@ -118,7 +118,8 @@ function update(){
  dot.style.width=dot.style.height=size.toFixed(2)+'px';
  dot.style.transform=`translate(${(x-size/2).toFixed(1)}px,${(y-size/2).toFixed(1)}px)`;
  // Its label moves from under the ruler dot to beside the timeline dot, growing as it goes.
- const relX=lerp(src.rel.x,labelRel.x,move),relY=lerp(src.rel.y,labelRel.y,move),scale=lerp(src.fontSize/parseFloat(label.style.fontSize),1,move);
+ // It starts centred on the ruler year (the two labels have different line-heights, so centres, not tops).
+ const s0=src.fontSize/parseFloat(label.style.fontSize),relX=lerp(src.rel.x,labelRel.x,move),relY=lerp(src.rel.y-lr.height*s0/2,labelRel.y,move),scale=lerp(s0,1,move);
  label.style.transform=`translate(${(x+relX).toFixed(1)}px,${(y+relY).toFixed(1)}px) scale(${scale.toFixed(4)})`;
 }
 let queued=false;

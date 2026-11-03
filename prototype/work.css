@@ -39,7 +39,8 @@ h1{font-size:clamp(60px,8.4vw,148px)}
 .work-ruler li{position:relative;padding-top:1.4cqw;color:var(--bone)}
 /* Dots are centred on the 1px ruler line: the li starts right under the border, so the line's centre is at -0.5px. */
 .ruler-dot{position:absolute;top:-.5px;inset-inline-start:0;width:.9cqw;height:.9cqw;min-width:6px;min-height:6px;border-radius:50%;background:var(--orange);box-shadow:0 0 0 .4cqw #ff641b2e;translate:0 -50%}
-.ruler-year{display:inline-block}
+.ruler-year{display:inline-block;translate:calc(-50% + max(.45cqw,3px)) 0}
+[dir=rtl] .ruler-year{translate:calc(50% - max(.45cqw,3px)) 0}
 .work-ruler .ruler-now{color:var(--orange)}
 .work-ruler .ruler-now .ruler-dot{background:transparent;border:1px solid var(--orange);box-shadow:none}
 .work-cue{margin:1.5cqw 0 0;display:flex;align-items:center;gap:.8cqw;font-size:clamp(13px,1.2cqw,18px);color:var(--muted)}
@@ -282,7 +283,7 @@ html[lang=ar] .tl-card h3{line-height:1.4}
 .ruler-mark .icon{width:1.15em;height:1.15em;color:var(--orange)}
 .ruler-mark::after{content:'';position:absolute;top:100%;left:50%;width:1px;height:max(1.2cqw,8px);background:#ffffff26}
 @container (width < 560px){.work-ruler .ruler-minor{display:none}}
-.work-ruler li:first-child .ruler-mark{inset-inline-start:-.5em;translate:0}.work-ruler li:first-child .ruler-mark::after{left:calc(.5em + max(.45cqw,3px))}[dir=rtl] .work-ruler li:first-child .ruler-mark::after{left:auto;right:calc(.5em + max(.45cqw,3px))}
+
 
 /* Phone hero: both actions on one row; contact becomes a light outlined button with a short label. */
 .btn-short{display:none}
@@ -299,9 +300,6 @@ html[lang=ar] .tl-card h3{line-height:1.4}
 @container (width < 560px){
  .work-ruler .ruler-mark{padding:.38em;font-size:12px}
  .work-ruler .ruler-mark>span{display:none}
- .work-ruler li:first-child .ruler-mark{inset-inline-start:max(.45cqw,3px);translate:-50% 0}
- [dir=rtl] .work-ruler li:first-child .ruler-mark{translate:50% 0}
- .work-ruler li:first-child .ruler-mark::after,[dir=rtl] .work-ruler li:first-child .ruler-mark::after{left:50%;right:auto}
 }
 /* The ruler's line is its own layer, so the morph can fold the line without squashing the dots and markers. */
 .work-ruler{position:relative;border-top-color:transparent}
