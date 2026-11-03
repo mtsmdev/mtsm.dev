@@ -143,6 +143,8 @@ function placeSpine(){
  const top=timeline.getBoundingClientRect().top;
  // A project dot's resting place is the top of its track (sticky moves it later); milestones are centred.
  const centre=item=>{const track=item.querySelector('.tl-track');if(track){const node=track.firstElementChild;return track.getBoundingClientRect().top+parseFloat(getComputedStyle(node).marginTop)+node.offsetHeight/2-top;}const b=item.querySelector('.tl-node').getBoundingClientRect();return b.top+b.height/2-top;};
+ for(const i of timeline.querySelectorAll('.is-last'))i.classList.remove('is-last');
+ items[items.length-1].classList.add('is-last');
  timeline.style.setProperty('--spine-top',centre(items[0]).toFixed(1)+'px');
  timeline.style.setProperty('--spine-bottom',(timeline.offsetHeight-centre(items[items.length-1])).toFixed(1)+'px');
 }

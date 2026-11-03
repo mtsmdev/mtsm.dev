@@ -53,7 +53,7 @@ h1{font-size:clamp(60px,8.4vw,148px)}
 .work .project-filters button{display:inline-flex;align-items:center;gap:10px;min-height:42px;padding:0 16px;border:1px solid var(--line-2);border-radius:999px;background:transparent;color:var(--muted);font:500 15px 'DM Sans',Arial,sans-serif;cursor:pointer;transition:background .25s,color .25s,border-color .25s}
 .work .project-filters button:hover{color:var(--bone);border-color:#ffffff40}
 .work .project-filters button.active{background:var(--bone);border-color:var(--bone);color:#16130f}
-.timeline{--year-col:132px;--gap:72px;--spine:calc(var(--year-col) + var(--gap)/2);position:relative;list-style:none;margin:0;padding:0}
+.timeline{--label-fs:clamp(44px,4.4vw,68px);--label-mid:calc(var(--label-fs)*.45);--sticky-top:clamp(24px,6vh,64px);--year-col:132px;--gap:72px;--spine:calc(var(--year-col) + var(--gap)/2);position:relative;list-style:none;margin:0;padding:0}
 .timeline::before,.timeline::after{content:'';position:absolute;z-index:0;top:var(--spine-top,37px);bottom:var(--spine-bottom,0px);inset-inline-start:calc(var(--spine) - 1px);width:2px;border-radius:2px;pointer-events:none}
 .timeline::before{background:var(--line-2);transform-origin:top;scale:1 var(--line-reveal,1)}
 .timeline::after{background:linear-gradient(var(--orange),#ff641b88);transform-origin:top;scale:1 0}
@@ -64,7 +64,7 @@ h1{font-size:clamp(60px,8.4vw,148px)}
 @keyframes spine-fill{to{scale:1 1}}
 .tl-year{display:grid;grid-template-columns:var(--year-col) 1fr;column-gap:var(--gap);align-items:start;padding-bottom:clamp(40px,5vw,64px)}
 .tl-year[hidden]{display:none}
-.tl-year-label{position:sticky;top:clamp(24px,6vh,64px);margin:0;font-family:'Barlow Condensed','Arial Narrow',sans-serif;font-weight:800;font-size:clamp(44px,4.4vw,68px);line-height:.9;letter-spacing:-.01em;font-variant-numeric:tabular-nums;color:transparent;-webkit-text-stroke:1px #ffffff40;transition:color .6s var(--ease-out),-webkit-text-stroke-color .6s}
+.tl-year-label{position:sticky;top:var(--sticky-top);margin:0;font-family:'Barlow Condensed','Arial Narrow',sans-serif;font-weight:800;font-size:var(--label-fs);line-height:.9;letter-spacing:-.01em;font-variant-numeric:tabular-nums;color:transparent;-webkit-text-stroke:1px #ffffff40;transition:color .6s var(--ease-out),-webkit-text-stroke-color .6s}
 .tl-year.in-view .tl-year-label{color:var(--bone);-webkit-text-stroke-color:transparent}
 .tl-items{list-style:none;margin:0;padding:0;display:grid;gap:22px}
 .tl-item{position:relative}
@@ -72,7 +72,9 @@ h1{font-size:clamp(60px,8.4vw,148px)}
 .tl-node{position:absolute;z-index:2;top:30px;inset-inline-start:calc(var(--gap)/-2 - 7px);width:14px;height:14px;border-radius:50%;background:#13120f;border:2px solid #4a453c;transition:border-color .5s,background .5s,box-shadow .5s}
 /* A project's dot rides down its card (like the year label) and stops at the card's end. */
 .tl-track{position:absolute;z-index:2;top:0;bottom:0;inset-inline-start:calc(var(--gap)/-2 - 7px);width:14px;pointer-events:none}
-.tl-track .tl-node{position:sticky;inset:auto;top:calc(clamp(24px,6vh,64px) + 23px);display:block;margin-top:30px}
+.tl-track .tl-node{position:sticky;inset:auto;top:calc(var(--sticky-top) + var(--label-mid) - 7px);display:block;margin-top:calc(var(--label-mid) - 7px)}
+/* The last dot stays put, so it never slides off the end of the spine. */
+.tl-item.is-last .tl-track .tl-node{position:relative;top:0}
 .tl-item.in-view .tl-node{border-color:var(--orange);background:var(--orange);box-shadow:0 0 0 6px #ff641b22}
 .tl-node-icon{top:50%;translate:0 -50%;inset-inline-start:calc(var(--gap)/-2 - 19px);width:38px;height:38px;display:grid;place-items:center;color:var(--muted);background:#1d1b17;border:1px solid var(--line-2)}
 .tl-node-icon .icon{width:18px;height:18px}
@@ -83,7 +85,9 @@ h1{font-size:clamp(60px,8.4vw,148px)}
 .tl-kind::before{content:'';width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.6}
 
 /* Milestones read as quiet waypoints, not cards. */
-.tl-milestone{padding:6px 0 4px}
+/* Milestones: the circle sits on the year label's centre, and so does the title line next to it. */
+.tl-milestone{padding:0}
+@media(min-width:761px){.tl-milestone .tl-node-icon{top:calc(var(--label-mid) - 19px);translate:none}.tl-milestone-body{margin-top:calc(var(--label-mid) - 41px)}}
 .tl-milestone .tl-meta{margin-bottom:4px}
 .tl-milestone-title{margin:0;font-size:1.0625rem;font-weight:600;color:var(--bone)}
 .tl-milestone-sub{margin:2px 0 0;font-size:var(--fs-small);color:var(--muted)}
