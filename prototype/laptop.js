@@ -284,7 +284,7 @@ const anchorPoint=new THREE.Vector3(),cornerW=[0,1,2,3].map(()=>new THREE.Vector
 let chipsShown=true;
 // Chip widths only change on resize; reading them per frame would force a layout after every write.
 const chips=orbits.flatMap(o=>[...o.children]);
-let chipHalf=[];const measureChips=()=>{chipHalf=chips.map(c=>c.offsetWidth/2);};
+let chipHalf=[],chipHalfH=[];const measureChips=()=>{chipHalf=chips.map(c=>c.offsetWidth/2);chipHalfH=chips.map(c=>c.offsetHeight/2);};
 // Chips sit right around the screen (data-u/data-v in the screen's frame; the back layer is partly hidden
 // behind the lid). Once the lid has opened they pop out of the screen one by one; on scroll they are pushed
 // outward with the growing laptop and fade.
@@ -300,19 +300,26 @@ function placeChips(p,now){
  const centre=anchorPoint.copy(tl).lerp(cornerW[2],.5).project(camera),cx=(centre.x+1)/2*w,cy=(1-centre.y)/2*h;
  const across=cornerW[1].clone().sub(tl),down=bl.clone().sub(tl);
  const project=(u,v)=>{anchorPoint.copy(tl).addScaledVector(across,u).addScaledVector(down,v).project(camera);return [(anchorPoint.x+1)/2*w,(1-anchorPoint.y)/2*h];};
+ // Chips shrink a little with a small laptop so they keep their spacing.
+ const [lx,ly]=project(0,0),[rx,ry]=project(1,0),size=Math.min(1,Math.max(.72,Math.hypot(rx-lx,ry-ly)/470));
  chips.forEach((chip,i)=>{
   const u0=+chip.dataset.u,v=+chip.dataset.v,u=side>0?u0:1-u0;
   const pop=reduced?1:clamp((now-start-2500-i*160)/650),e=popEase(pop);
   // From a point just inside the screen to the chip's spot outside it.
-  const [ox,oy]=project(Math.min(Math.max(u,.18),.82),Math.min(Math.max(v,.18),.82)),[ax,ay]=project(u,v);
-  const half=chipHalf[i]||60;
+  let half=chipHalf[i]||60;
+  half*=size;
+  let [ox,oy]=project(Math.min(Math.max(u,.18),.82),Math.min(Math.max(v,.18),.82)),[ax,ay]=project(u,v);
+  // A chip tucked behind the lid is placed by its inner edge (data-edge: x for the side, y for the top), so only
+  // a sliver hides behind it whatever its width or the laptop's size.
+  if(chip.dataset.edge==='x')ax+=(Math.sign(ax-cx)||1)*(half-16*size);
+  else if(chip.dataset.edge==='y')ay+=(Math.sign(ay-cy)||-1)*((chipHalfH[i]||19)*size-10*size);
   let x=ox+(ax-ox)*e,y=oy+(ay-oy)*e;
   x=Math.min(Math.max(x,half+16),w-half-16);y=Math.min(Math.max(y,32),h-130);// on screen, clear of the dock
   const dx=x-cx,dy=y-cy,len=Math.hypot(dx,dy)||1,tx=x+dx/len*90*spread,ty=y+dy/len*90*spread;
   const opacity=Math.max(0,Math.min(1,pop*1.6)*(1-smooth(.05,.22,p)));
   // One transform per chip, written only when it changed: per-frame style writes cost recalcs.
-  const key=Math.round(tx*2)+','+Math.round(ty*2)+','+opacity.toFixed(2);
-  if(chip._key!==key){chip._key=key;chip.style.transform=`translate(${tx.toFixed(1)}px,${ty.toFixed(1)}px)`;chip.style.opacity=opacity.toFixed(2);}
+  const key=Math.round(tx*2)+','+Math.round(ty*2)+','+opacity.toFixed(2)+','+size.toFixed(2);
+  if(chip._key!==key){chip._key=key;chip.style.transform=`translate(${tx.toFixed(1)}px,${ty.toFixed(1)}px) scale(${size.toFixed(2)})`;chip.style.opacity=opacity.toFixed(2);}
  });
 }
 const layoutObserver=new ResizeObserver(resize);layoutObserver.observe(host);layoutObserver.observe(heroCopy);resize();
