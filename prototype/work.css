@@ -307,3 +307,8 @@ html[lang=ar] .tl-card h3{line-height:1.4}
 .work-ruler::before{content:'';position:absolute;inset-inline:0;top:-1px;height:1px;background:var(--line-2);transform-origin:var(--fold-x,0) 0;scale:var(--line-scale,1) 1;opacity:var(--line-alpha,1)}
 /* The timeline overlaps the bottom of the panel, so it paints above the hero. */
 .journey-on .work-body{position:relative;z-index:5}
+/* The cursor swallowed by a call to action: it shrinks into the button and a small ring chases the pointer inside. */
+.cursor[data-state=eaten] .cursor-ring{width:8px;height:8px;margin:-4px 0 0 -4px;opacity:0;border-color:var(--orange)}
+.cursor[data-state=eaten] .cursor-dot{opacity:0}
+.btn-trapped{position:absolute;top:0;left:0;z-index:-1;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;border:1.5px solid #17120c70;background:#17120c14;opacity:0;scale:.2;transition:opacity .25s,scale .4s var(--ease-out);pointer-events:none;will-change:transform}
+.btn-trapped.on{opacity:1;scale:1}
