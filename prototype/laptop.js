@@ -11,7 +11,7 @@ const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isInte
 // Tilt follows a mouse or pen; touch scrolling must not shake the laptop.
 window.addEventListener('pointermove',e=>{if(e.pointerType==='touch')return;px=e.clientX/innerWidth-.5;py=e.clientY/innerHeight-.5;},{passive:true});
 const heroCopy=document.querySelector('.hero-copy'),workReveals=[...work.querySelectorAll('.reveal')];
-const panel=work.querySelector('.work-screen'),hero=journey.querySelector('.hero');
+const panel=work.querySelector('.work-screen'),hero=journey.querySelector('.hero'),orbit=journey.querySelector('.skill-orbit');
 let journeyTop=0,journeyEnd=1,lastPageProgress=-1,projectsRevealed=false;
 function measureJourney(){journeyTop=journey.getBoundingClientRect().top+window.scrollY;journeyEnd=Math.max(1,journey.offsetHeight-innerHeight);lastPageProgress=-1;}
 measureJourney();window.addEventListener('resize',measureJourney,{passive:true});
@@ -19,6 +19,8 @@ new ResizeObserver(measureJourney).observe(journey);
 function progress(){return clamp((window.scrollY-journeyTop)/journeyEnd);}
 function updatePage(p){
  if(p===lastPageProgress)return;lastPageProgress=p;
+ // Skill chips drift apart and fade as the laptop turns toward the screen.
+ if(orbit)orbit.style.setProperty('--spread',smooth(0,.24,p).toFixed(3));
  heroCopy.style.opacity=1-smooth(.03,.27,p);heroCopy.style.transform=`translateY(${-smooth(0,.3,p)*50}px)`;heroCopy.style.visibility=p>.3?'hidden':'visible';
  if(reduced){work.style.opacity=1;work.style.transform='';work.style.pointerEvents='auto';}
  else{
@@ -138,7 +140,7 @@ function resize(){
  // On portrait screens the laptop sits in the free space below the hero buttons.
  portrait=camera.aspect<.9;freeTop=heroActions?heroCopy.offsetTop+heroActions.offsetTop+heroActions.offsetHeight:0;
  // Portrait: the laptop tabs sit between the buttons and the laptop.
- if(portrait)fitPortrait(w,h);
+ if(portrait)fitPortrait(w,h);else fitLandscape(w,h);
  layoutPanel();
  renderDirty=true;
 }
@@ -232,6 +234,54 @@ function mapPanel(p){
  const facing=(pts[2]-pts[0])*(pts[7]-pts[1])-(pts[3]-pts[1])*(pts[6]-pts[0])>0;
  panel.style.transform=quadMatrix(panelW,panelH,pts);panel.style.opacity=facing?screenMix.toFixed(3):'0';panelShown=true;
 }
+// Landscape: the laptop takes the free side, centred vertically on its projected size, with its outer
+// edge kept inside the viewport. Fitted on the projection because the model isn't symmetric, so a
+// mirrored RTL pose needs a different offset than LTR.
+let landScale=1,landX=0,landY=0;
+function fitLandscape(w,h){
+ const distance=mobile?10.5:10.8,tangent=Math.tan(THREE.MathUtils.degToRad(17.5)),perPx=2*tangent*distance/h,viewWidth=perPx*w;
+ fitCam.aspect=w/h;fitCam.updateProjectionMatrix();fitCam.position.set(0,.65,distance);fitCam.lookAt(0,-.01,-.25);fitCam.updateMatrixWorld();
+ landScale=Math.min(h<520?.78:1.04,viewWidth*.39/4.7);landX=viewWidth*.25*side;landY=0;
+ const bounds=()=>{
+  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+  for(let i=0;i<8;i++){
+   corner.set(i&1?fitBox.max.x:fitBox.min.x,i&2?fitBox.max.y:fitBox.min.y,i&4?fitBox.max.z:fitBox.min.z).multiplyScalar(landScale);
+   corner.x+=landX;corner.y+=landY;corner.project(fitCam);
+   const x=(corner.x+1)/2*w,y=(1-corner.y)/2*h;minX=Math.min(minX,x);maxX=Math.max(maxX,x);minY=Math.min(minY,y);maxY=Math.max(maxY,y);
+  }
+  return {minX,maxX,minY,maxY};
+ };
+ for(let pass=0;pass<4;pass++){
+  const b=bounds();
+  landY+=((b.minY+b.maxY)/2-h/2)*perPx;
+  if(side>0&&b.maxX>w*.97)landX-=(b.maxX-w*.97)*perPx;
+  if(side<0&&b.minX<w*.03)landX+=(w*.03-b.minX)*perPx;
+ }
+}
+// Skill chips are anchored to points around the laptop screen, in the screen's own frame: u runs along
+// the top edge (0 = left corner, 1 = right), v down the side (0 = top, 1 = hinge). Projected every frame,
+// so they follow the laptop's tilt. Mirrored for RTL; each drifts straight away from the laptop on scroll.
+const chipAnchors=[[.1,-.24],[.56,-.32],[1.02,-.2],[-.2,.45],[.02,1.3],[.5,1.46],[.98,1.34]];
+const anchorPoint=new THREE.Vector3(),cornerW=[0,1,2,3].map(()=>new THREE.Vector3());
+let chipsShown=true;
+function placeChips(p){
+ if(!orbit)return;
+ const show=!portrait&&p<.3;
+ if(!show){if(chipsShown){orbit.style.visibility='hidden';chipsShown=false;}return;}
+ if(!chipsShown){orbit.style.visibility='';chipsShown=true;}
+ laptop.updateMatrixWorld(true);camera.updateMatrixWorld();
+ screenCorners.forEach((c,i)=>cornerW[i].copy(c).applyMatrix4(display.matrixWorld));
+ const [tl,tr,,bl]=cornerW,w=host.clientWidth,h=host.clientHeight;
+ const centre=anchorPoint.copy(tl).lerp(cornerW[2],.5).project(camera),cx=(centre.x+1)/2*w,cy=(1-centre.y)/2*h;
+ [...orbit.children].forEach((chip,i)=>{
+  const [u0,v]=chipAnchors[i%chipAnchors.length],u=side>0?u0:1-u0;
+  anchorPoint.copy(tl).addScaledVector(cornerW[1].clone().sub(tl),u).addScaledVector(bl.clone().sub(tl),v).project(camera);
+  // Keep every chip on screen and clear of the dock.
+  const half=(chip.offsetWidth||120)/2,x=Math.min(Math.max((anchorPoint.x+1)/2*w,half+16),w-half-16),y=Math.min(Math.max((1-anchorPoint.y)/2*h,32),h-130),dx=x-cx,dy=y-cy,len=Math.hypot(dx,dy)||1;
+  chip.style.setProperty('--cx',x.toFixed(1)+'px');chip.style.setProperty('--cy',y.toFixed(1)+'px');
+  chip.style.setProperty('--dx',(dx/len*180).toFixed(0)+'px');chip.style.setProperty('--dy',(dy/len*180).toFixed(0)+'px');
+ });
+}
 const layoutObserver=new ResizeObserver(resize);layoutObserver.observe(host);layoutObserver.observe(heroCopy);resize();
 // A language switch mirrors the scene for RTL and redraws every screen once its fonts are loaded.
 window.addEventListener('i18nchange',async()=>{
@@ -260,7 +310,7 @@ function pose(now,p){
  const tangent=Math.tan(THREE.MathUtils.degToRad(17.5)),startDistance=mobile?10.5:10.8,viewHeight=2*tangent*startDistance,viewWidth=viewHeight*camera.aspect;
  let startScale,startX,startY;
  if(portrait){startScale=fitScale;startX=fitX;startY=fitY;}
- else{startScale=Math.min(innerHeight<520?.78:.95,viewWidth*.36/4.7);startX=viewWidth*.265*side;startY=mobile?-1.3:innerHeight<520?-.35:-.1;}// short landscape: clear the header
+ else{startScale=landScale;startX=landX;startY=landY;}
  laptop.scale.setScalar(THREE.MathUtils.lerp(startScale,1,turn));
  laptop.position.set(THREE.MathUtils.lerp(startX,0,turn),THREE.MathUtils.lerp(startY,-.01,turn)-(1-intro)*.12,0);
  // Landscape zooms until the screen covers the view; portrait fits the screen's width instead of cropping it.
@@ -292,7 +342,7 @@ function frame(now){requestAnimationFrame(frame);if(document.hidden){lastNow=0;l
  const p=progress();updatePage(p);if(p>=1&&!reduced){lastRenderAt=0;return;}
  if(reduced){sx=sy=0;}else{sx=THREE.MathUtils.damp(sx,px,6,dt);sy=THREE.MathUtils.damp(sy,py,6,dt);if(Math.abs(sx-px)<1e-4)sx=px;if(Math.abs(sy-py)<1e-4)sy=py;}
  settleSpin(dt);
- const {openAmount,intro}=pose(now,p);updateScreen(now,p,dt);mapPanel(p);
+ const {openAmount,intro}=pose(now,p);updateScreen(now,p,dt);mapPanel(p);placeChips(p);
  const renderKey=[p.toFixed(5),openAmount.toFixed(5),intro.toFixed(5),sx.toFixed(4),sy.toFixed(4),spin.yaw.toFixed(4),spin.pitch.toFixed(4),screenMix.toFixed(4),screenRevision].join(':');
  if(renderDirty||renderKey!==lastRenderKey){renderer.render(scene,camera);lastRenderKey=renderKey;renderDirty=false;governFrameRate(now);}else lastRenderAt=0;
 }
