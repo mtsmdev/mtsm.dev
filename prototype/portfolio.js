@@ -104,10 +104,10 @@ function renderHero(){
 }
 let journeyFrame=null;
 function stopJourney(){if(journeyFrame!==null)cancelAnimationFrame(journeyFrame);journeyFrame=null;}
-function scrollToProjects(top,reduced){
+function scrollToProjects(top,reduced,duration=2000){
  stopJourney();
  if(reduced){window.scrollTo({top,behavior:'instant'});return;}
- const from=window.scrollY,distance=top-from,start=performance.now(),duration=2000;
+ const from=window.scrollY,distance=top-from,start=performance.now();
  function advance(now){
   const t=Math.min(1,(now-start)/duration),eased=t*t*(3-2*t);
   window.scrollTo({top:from+distance*eased,behavior:'instant'});
@@ -130,7 +130,16 @@ function enterProjects(){
  history.replaceState(null,'','#work');
 }
 document.querySelectorAll('a[href="#work"]').forEach(link=>{if(link===laptopAction||link===primaryAction)return;link.addEventListener('click',event=>{event.preventDefault();enterProjects();});});
-for(const link of [laptopAction,primaryAction])link.addEventListener('click',event=>{event.preventDefault();enterProjects();});
+laptopAction.addEventListener('click',event=>{event.preventDefault();enterProjects();});
+// The main call to action goes all the way to the first project, through the journey and the morph.
+function firstProject(){
+ const card=document.querySelector('.tl-project:not([hidden]) .tl-card');if(!card)return enterProjects();
+ const reduced=document.body.classList.contains('reduced')||document.body.classList.contains('no-webgl');
+ const top=card.getBoundingClientRect().top+scrollY-(innerWidth<=760?96:124);
+ scrollToProjects(top,reduced,2800);
+ history.replaceState(null,'','#work');
+}
+primaryAction.addEventListener('click',event=>{event.preventDefault();firstProject();});
 renderHero();
 filters.forEach(button=>button.addEventListener('click',()=>{
  filters.forEach(b=>{b.classList.toggle('active',b===button);b.setAttribute('aria-pressed',String(b===button));});
