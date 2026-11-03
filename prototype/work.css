@@ -305,3 +305,5 @@ html[lang=ar] .tl-card h3{line-height:1.4}
 /* The ruler's line is its own layer, so the morph can fold the line without squashing the dots and markers. */
 .work-ruler{position:relative;border-top-color:transparent}
 .work-ruler::before{content:'';position:absolute;inset-inline:0;top:-1px;height:1px;background:var(--line-2);transform-origin:var(--fold-x,0) 0;scale:var(--line-scale,1) 1;opacity:var(--line-alpha,1)}
+/* The timeline overlaps the bottom of the panel, so it paints above the hero. */
+.journey-on .work-body{position:relative;z-index:5}

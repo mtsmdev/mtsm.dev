@@ -54,7 +54,7 @@ function source(){
   rel:{x:li.offsetLeft+srcLabel.offsetLeft-ox,y:li.offsetTop+srcLabel.offsetTop-oy},fontSize:parseFloat(getComputedStyle(srcLabel).fontSize)};
 }
 function setSources(o){srcDot.style.opacity=srcLabel.style.opacity=o;}
-function setTargets(o,node){tgtLabel.style.opacity=o;if(node)node.style.opacity=o;}
+function setTargets(o,node,label=o){tgtLabel.style.opacity=label;if(node)node.style.opacity=o;}
 function clear(){
  if(!active)return;active=false;layer.classList.remove('on');
  for(const el of [srcDot,srcLabel,tgtLabel,ruler,cue,...others,...heading])el?.removeAttribute('style');lastAway='0';
@@ -76,13 +76,15 @@ function update(){
  const src=source();
  // Step 1 runs over the first stretch of scrolling after the hand-off (shorter if the timeline is close).
  // On phones it takes almost the whole way, so the label grows gradually instead of all at once.
- const total=tgt.y+Math.max(0,d)-holdY,span=Math.max(80,narrow?total*.9:Math.min(H*.42,total*.8));
+ const total=tgt.y+Math.max(0,d)-holdY,span=Math.max(80,narrow?tgt.y+Math.max(0,d)-H*.45:Math.min(H*.42,total*.8));// on phones: until the real dot has lit up (45% down)
  const a=clamp(d/span),fold=smooth(0,.55,a),move=narrow?smooth(0,1,a):ease(smooth(.25,1,a));
  // The filter chips rise in once the year label has landed in its column, or as they reach the label's
  // height, whichever comes first; scrolling back up sends them away again.
- if(chips&&!reduced){const labelBottom=Math.max(src.y,holdY)+lerp(src.rel.y,labelRel.y,move)+lr.height;chips.classList.toggle('chips-in',a>=.95||chips.getBoundingClientRect().top<=labelBottom);}
+ // On phones they show as soon as they are in view, so it is clear early on that they can be tapped.
+ if(chips&&!reduced&&narrow)chips.classList.toggle('chips-in',chips.getBoundingClientRect().top<H*.92);
+ else if(chips&&!reduced){const labelBottom=Math.max(src.y,holdY)+lerp(src.rel.y,labelRel.y,move)+lr.height;chips.classList.toggle('chips-in',a>=.95||chips.getBoundingClientRect().top<=labelBottom);}
  // Step 3: once the real dot reaches the hold line, the line draws down over the next stretch.
- timeline.style.setProperty('--line-reveal',clamp((holdY-tgt.y)/(H*.6)).toFixed(3));
+ timeline.style.setProperty('--line-reveal',clamp(narrow?(d-span)/(H*.6):(holdY-tgt.y)/(H*.6)).toFixed(3));
  // Step 1, the ruler: everything folds into the dot; the other years and the hint fade.
  // Only the line is scaled; the other years and their markers slide in at full size (never squashed) and
  // fade as they close in on each other.
@@ -98,11 +100,16 @@ function update(){
  if(cue)cue.style.opacity=(1-smooth(0,.2,a)).toFixed(3);
  const away=narrow?smooth(.1,.55,a).toFixed(3):'0';
  if(away!==lastAway){lastAway=away;for(const el of heading){el.style.opacity=away==='0'?'':1-away;el.style.transform=away==='0'?'':`translateY(${(-28*away).toFixed(1)}px)`;}}
- if(d<=0){layer.classList.remove('on');setSources('');setTargets('0',tgt.node);return;}
- if(tgt.y<=holdY){layer.classList.remove('on');setSources('0');setTargets('',tgt.node);return;}
- setSources('0');setTargets('0',tgt.node);layer.classList.add('on');
+ // On phones the year label is simply part of the timeline; only the dot travels.
+ const targetLabel=narrow?'':'0';
+ if(d<=0){layer.classList.remove('on');setSources('');setTargets('0',tgt.node,targetLabel);return;}
+ if(narrow?a>=1:tgt.y<=holdY){layer.classList.remove('on');setSources('0');setTargets('',tgt.node);return;}
+ setSources('0');setTargets('0',tgt.node,targetLabel);layer.classList.add('on');
+ label.style.visibility=narrow?'hidden':'';
+ if(narrow)srcLabel.style.opacity=(1-smooth(0,.3,a)).toFixed(3);
  // Step 2, the travelling dot: sideways during step 1, riding up with the page until the hold line.
- const x=lerp(src.x,tgt.x,move),y=Math.max(src.y,holdY),size=lerp(src.size,tgt.size,move);
+ // On phones it goes straight to the real dot instead of holding.
+ const x=lerp(src.x,tgt.x,move),y=narrow?lerp(src.y,tgt.y,move):Math.max(src.y,holdY),size=lerp(src.size,tgt.size,move);
  dot.style.width=dot.style.height=size.toFixed(2)+'px';
  dot.style.transform=`translate(${(x-size/2).toFixed(1)}px,${(y-size/2).toFixed(1)}px)`;
  // Its label moves from under the ruler dot to beside the timeline dot, growing as it goes.
