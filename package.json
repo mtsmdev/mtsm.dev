@@ -1,0 +1,15 @@
+{
+  "name": "mtsm-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Personal portfolio of Moatasem Alhumsi Alrefaai",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "node prototype/server.cjs",
+    "check": "node scripts/check.mjs",
+    "build": "node scripts/build.mjs"
+  }
+}
