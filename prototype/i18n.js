@@ -90,7 +90,7 @@ const strings={
   'about.langLabel':'LANGUAGES','about.langs':'Dutch · English · Arabic','about.langNote':'Also at home in interfaces that read right to left.',
   'hero.contact':'Get in touch',
   'contact.title':'Let’s build something.','contact.lead':'A project, a question or just to say hi? Pick whatever is easiest for you. I’d love to hear from you.',
-  'contact.mail':'Email','contact.whatsapp':'WhatsApp','contact.linkedin':'LinkedIn','contact.copyright':'© 2026 Moatasem Al-Refaai','contact.place':'Leidschendam, the Netherlands'
+  'contact.mail':'Email','contact.phone':'Phone & WhatsApp','contact.linkedin':'LinkedIn','contact.actMail':'Email','contact.actCopy':'Copy','contact.actCall':'Call','contact.actWhatsapp':'WhatsApp','contact.actProfile':'View profile','contact.copyright':'© 2026 Moatasem Al-Refaai','contact.place':'Leidschendam, the Netherlands'
  },
  ar:{
   'meta.title':'معتصم الرفاعي — مطوّر برمجيات',
@@ -178,7 +178,7 @@ const strings={
   'about.langLabel':'اللغات','about.langs':'الهولندية · الإنجليزية · العربية','about.langNote':'وأتقن بناء الواجهات التي تُقرأ من اليمين إلى اليسار.',
   'hero.contact':'تواصل معي',
   'contact.title':'لنبنِ شيئًا معًا.','contact.lead':'مشروع أو سؤال أو مجرد تعارف؟ اختر الطريقة الأسهل لك، ويسعدني أن أسمع منك.',
-  'contact.mail':'البريد الإلكتروني','contact.whatsapp':'واتساب','contact.linkedin':'لينكدإن','contact.copyright':'© 2026 معتصم الرفاعي','contact.place':'لايدسخندام، هولندا'
+  'contact.mail':'البريد الإلكتروني','contact.phone':'الهاتف وواتساب','contact.linkedin':'لينكدإن','contact.actMail':'راسلني','contact.actCopy':'نسخ','contact.actCall':'اتصال','contact.actWhatsapp':'واتساب','contact.actProfile':'عرض الملف','contact.copyright':'© 2026 معتصم الرفاعي','contact.place':'لايدسخندام، هولندا'
  }
 };
 // Copy that scripts render (buttons, headline, counters), in every language.
@@ -186,17 +186,20 @@ const scriptStrings={
  nl:{
   hero:{button:'Bekijk mijn werk',headline:'CODE MET',label:'Bekijk mijn projecten'},
   privateMail:{subject:'Inzage in de code van {project}',body:'Hoi Moatasem,\n\nIk zou graag de code van {project} willen bekijken:\n{repos}\n\nGroet,'},
-  words:['KOFFIE>THEE','GEDULD','BETEKENIS','IHSAN']
+  words:['KOFFIE>THEE','GEDULD','BETEKENIS','IHSAN'],
+  copied:'Gekopieerd'
  },
  en:{
   hero:{button:'View my work',headline:'CODE WITH',label:'View my projects'},
   privateMail:{subject:'Access to the {project} code',body:'Hi Moatasem,\n\nI’d like to take a look at the code for {project}:\n{repos}\n\nBest regards,'},
-  words:['COFFEE>TEA','PATIENCE','PURPOSE','IHSAN']
+  words:['COFFEE>TEA','PATIENCE','PURPOSE','IHSAN'],
+  copied:'Copied'
  },
  ar:{
   hero:{button:'شاهد أعمالي',headline:'برمجة',label:'استعرض مشاريعي'},
   privateMail:{subject:'طلب الاطلاع على شيفرة {project}',body:'مرحبًا معتصم،\n\nأودّ الاطلاع على شيفرة {project}:\n{repos}\n\nمع التحية،'},
-  words:['بالقهوة>بالشاي','بصبر','بهدف','بإحسان']
+  words:['بالقهوة>بالشاي','بصبر','بهدف','بإحسان'],
+  copied:'تم النسخ'
  }
 };
 const supported=Object.keys(scriptStrings);

@@ -180,11 +180,11 @@ if(matchMedia('(hover: hover) and (pointer: fine)').matches&&!matchMedia('(prefe
  let tilted=null;
  const reset=card=>{card.style.transform='';};
  addEventListener('pointermove',event=>{
-  const card=event.target instanceof Element?event.target.closest('.tl-card,.contact-card'):null;
+  const card=event.target instanceof Element?event.target.closest('.tl-card'):null;
   if(tilted&&tilted!==card){reset(tilted);tilted=null;}
   if(!card)return;
   const box=card.getBoundingClientRect(),x=(event.clientX-box.left)/box.width,y=(event.clientY-box.top)/box.height;
-  const max=card.classList.contains('contact-card')?7:3;// big project cards tilt less
+  const max=3;// big cards, so a small tilt
   card.style.setProperty('--mx',(x*100).toFixed(1)+'%');card.style.setProperty('--my',(y*100).toFixed(1)+'%');
   card.style.transform=`perspective(1100px) rotateX(${((.5-y)*max*1.6).toFixed(2)}deg) rotateY(${((x-.5)*max*2).toFixed(2)}deg)`;
   tilted=card;
@@ -205,3 +205,13 @@ function privateLinks(){
  }
 }
 privateLinks();addEventListener('i18nchange',privateLinks);
+
+// Copy buttons in the contact section: a short confirmation, announced to screen readers.
+for(const button of document.querySelectorAll('[data-copy]')){
+ const label=button.querySelector('span'),use=button.querySelector('use');label.setAttribute('aria-live','polite');
+ button.addEventListener('click',async()=>{
+  try{await navigator.clipboard.writeText(button.dataset.copy);}catch{return;}
+  label.textContent=i18n.text().copied;use.setAttribute('href','#i-check');button.classList.add('copied');
+  clearTimeout(button._reset);button._reset=setTimeout(()=>{label.textContent=i18n.t('contact.actCopy');use.setAttribute('href','#i-copy');button.classList.remove('copied');},2000);
+ });
+}
