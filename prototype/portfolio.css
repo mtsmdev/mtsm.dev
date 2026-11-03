@@ -191,8 +191,9 @@ html[lang=ar] .about .profile-facts p,html[lang=ar] .archive-body p,html[lang=ar
 @media(max-width:600px){
  .dock{left:10px;right:10px;translate:none;justify-content:space-between;padding:5px;border-radius:16px}
  .dock-item{flex-direction:column;justify-content:center;gap:3px;min-height:52px;min-width:0;flex:1;padding:0 4px;font-size:11px}
- .dock-sep{display:none}
- .dock .lang-menu summary{flex-direction:column;justify-content:center;gap:3px;min-height:52px;padding:0 8px;font-size:11px}
+ .dock-item[data-section=top]{display:none}
+ .dock-sep{height:30px;margin:0 3px;flex:none}
+ .dock .lang-menu summary{flex-direction:column;justify-content:center;gap:3px;min-height:52px;padding:0 14px;font-size:11px}
 }
 
 
