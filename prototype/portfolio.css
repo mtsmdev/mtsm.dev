@@ -88,3 +88,39 @@ nav a[aria-current=page]{color:var(--orange)}
 .word-tip{position:absolute;z-index:6;top:0;left:0;margin:0;width:max-content;max-width:min(340px,calc(100vw - 32px));padding:14px 16px;border-radius:8px;background:#f3ede3;color:#1d1b17;font-size:13px;line-height:1.55;box-shadow:0 14px 34px #0008;pointer-events:none;visibility:hidden;opacity:0;transform:translateY(6px);transition:opacity .18s,transform .18s,visibility 0s .18s}
 .word-tip.open{visibility:visible;opacity:1;transform:none;transition:opacity .18s,transform .18s}
 .word-tip strong{font-weight:700}.word-tip [lang=ar]{color:#a8461a}
+
+/* Responsive pass: readable small labels, real touch targets and phone-friendly layout. */
+.logo{letter-spacing:-.23em;padding-right:.18em}.logo span{font-size:.73em;left:.34em;top:.07em}
+.archive-name{flex:1}
+.archive-heading>span{white-space:nowrap}
+.section-top>span,.work .section-top .eyebrow,.case-kicker,.backend-note>span,.archive-heading .eyebrow,.profile-facts small{font-size:10px}
+.preview-bar{font-size:9px}
+.case-visual figcaption,.amposter-phones small,.archive-name>small,.filter-count,.project-filters button span{font-size:10px}
+.project-kind{font-size:9px;max-width:110px}
+.tech-tags span,.skills{font-size:11px}
+.source-links{font-size:11px}
+footer>div{font-size:11px}
+footer{padding-bottom:70px}
+@media(pointer:coarse){
+ nav a,.case-links a,.source-links a,.archive-body a,.profile-links a,footer>div a,.hero .text-link{position:relative}
+ nav a::after,.case-links a::after,.source-links a::after,.archive-body a::after,.profile-links a::after,footer>div a::after,.hero .text-link::after{content:'';position:absolute;inset:-12px -8px}
+ .project-filters button{min-height:42px}
+}
+@media(max-width:600px){
+ nav{gap:20px}nav a{font-size:13px}
+ .hero .eyebrow{font-size:10px}
+ .annotation .fine{font-size:9px}
+ .case-kicker{font-size:10px}
+ footer>div{display:grid;grid-template-columns:1fr 1fr;gap:18px 16px;font-size:12px}
+ footer{padding-bottom:50px}
+}
+/* Phones held sideways: a short hero that still fits headline, intro and buttons. */
+@media(orientation:landscape) and (max-height:520px){
+ header{height:64px}.logo{font-size:32px}
+ .scroll-journey .hero-copy{padding-top:82px;width:54%}
+ .scroll-journey h1{font-size:min(11vw,19vh)}
+ .hero .eyebrow{margin-bottom:10px}
+ .hero .intro{font-size:13px;line-height:1.5;margin:12px 0 14px;max-width:330px}
+ .hero .primary{min-height:44px;padding:11px 16px}
+ .scroll-journey .annotation{display:none}
+}
