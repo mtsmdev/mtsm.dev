@@ -1,5 +1,6 @@
 // The horizontal year ruler on the projects panel turns into the vertical timeline, in three steps:
-// 1. the ruler folds into the newest year's dot while that dot and its label slide sideways to the
+// 1. the ruler line folds into the newest year's dot (the other years slide in with it and fade as they
+//    crowd together) while that dot and its label slide sideways to the
 //    timeline's column (the label growing into the big year label);
 // 2. the dot holds its place while the timeline scrolls up underneath it;
 // 3. when the real first dot arrives it takes over, and the vertical line draws down from it.
@@ -16,7 +17,7 @@ const srcDot=srcItem.querySelector('.ruler-dot'),srcLabel=srcItem.querySelector(
 const ruler=panel.querySelector('.work-ruler'),cue=panel.querySelector('.work-cue');
 // On phones the year label rises into the panel heading's place, so the heading makes way.
 const heading=[panel.querySelector('h2'),panel.querySelector('.work-sub')].filter(Boolean);
-const others=[...ruler.children].filter(li=>li!==srcItem);
+const others=[...ruler.children].filter(li=>li!==srcItem),otherDots=others.map(li=>li.querySelector('.ruler-dot'));
 const tgtLabel=firstYear.querySelector('.tl-year-label');
 const tgtItem=()=>firstYear.querySelector('.tl-item:not([hidden])');
 
@@ -83,10 +84,17 @@ function update(){
  // Step 3: once the real dot reaches the hold line, the line draws down over the next stretch.
  timeline.style.setProperty('--line-reveal',clamp((holdY-tgt.y)/(H*.6)).toFixed(3));
  // Step 1, the ruler: everything folds into the dot; the other years and the hint fade.
- ruler.style.transformOrigin=`${src.originX.toFixed(1)}px 0`;
- ruler.style.scale=`${(1-fold).toFixed(4)} 1`;
- ruler.style.borderTopColor=`rgba(255,255,255,${(.13*(1-fold)).toFixed(3)})`;
- const fade=(1-smooth(0,.4,a)).toFixed(3);for(const li of others)li.style.opacity=fade;
+ // Only the line is scaled; the other years and their markers slide in at full size (never squashed) and
+ // fade as they close in on each other.
+ ruler.style.setProperty('--fold-x',src.originX.toFixed(1)+'px');
+ ruler.style.setProperty('--line-scale',(1-fold).toFixed(4));
+ ruler.style.setProperty('--line-alpha',(1-smooth(.5,1,fold)).toFixed(3));
+ const left=1-fold,crowd=smooth(.3,.75,left);
+ others.forEach((li,i)=>{
+  const dot=otherDots[i],dx=src.originX-(li.offsetLeft+dot.offsetLeft+dot.offsetWidth/2);
+  li.style.transform=fold?`translateX(${(dx*fold).toFixed(1)}px)`:'';
+  li.style.opacity=fold?Math.min(crowd,clamp(Math.abs(dx)*left/48)).toFixed(3):'';
+ });
  if(cue)cue.style.opacity=(1-smooth(0,.2,a)).toFixed(3);
  const away=narrow?smooth(.1,.55,a).toFixed(3):'0';
  if(away!==lastAway){lastAway=away;for(const el of heading){el.style.opacity=away==='0'?'':1-away;el.style.transform=away==='0'?'':`translateY(${(-28*away).toFixed(1)}px)`;}}

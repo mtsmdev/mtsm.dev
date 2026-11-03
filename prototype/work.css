@@ -238,7 +238,7 @@ html[lang=ar] .contact h2{font-size:clamp(44px,6.4vw,104px)}
 .morph-dot{border-radius:50%;background:var(--orange);box-shadow:0 0 0 6px #ff641b22}
 .morph-year{transform-origin:0 0;color:var(--bone);white-space:nowrap;font-variant-numeric:tabular-nums}
 .work-ruler li{transition:none}
-.work-ruler{will-change:scale}
+.work-ruler li{will-change:transform,opacity}
 /* Filter chips: rise, turn and fade in one by one. */
 .project-filters.chips-ready button{opacity:0;translate:0 22px;rotate:-5deg;transition:opacity .6s var(--ease-out),translate .8s var(--ease-out),rotate .8s var(--ease-out),background .25s,color .25s,border-color .25s;transition-delay:calc(var(--i,0)*90ms),calc(var(--i,0)*90ms),calc(var(--i,0)*90ms),0s,0s,0s}
 [dir=rtl] .project-filters.chips-ready button{rotate:5deg}
@@ -302,3 +302,6 @@ html[lang=ar] .tl-card h3{line-height:1.4}
  [dir=rtl] .work-ruler li:first-child .ruler-mark{translate:50% 0}
  .work-ruler li:first-child .ruler-mark::after,[dir=rtl] .work-ruler li:first-child .ruler-mark::after{left:50%;right:auto}
 }
+/* The ruler's line is its own layer, so the morph can fold the line without squashing the dots and markers. */
+.work-ruler{position:relative;border-top-color:transparent}
+.work-ruler::before{content:'';position:absolute;inset-inline:0;top:-1px;height:1px;background:var(--line-2);transform-origin:var(--fold-x,0) 0;scale:var(--line-scale,1) 1;opacity:var(--line-alpha,1)}
