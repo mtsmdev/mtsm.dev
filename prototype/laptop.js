@@ -25,7 +25,7 @@ function updatePage(p){
  if(p>.84&&!projectsRevealed){projectsRevealed=true;workReveals.forEach(e=>e.classList.add('visible'));}
 }
 try{
-const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(1.25);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
+const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:'high-performance'});renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
 const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(35,1,.03,100),pmrem=new THREE.PMREMGenerator(renderer),room=new RoomEnvironment();scene.environment=pmrem.fromScene(room,.04).texture;room.dispose();pmrem.dispose();
 const {laptop,lid,display}=await createXPS();scene.add(laptop);
 const key=new THREE.DirectionalLight(0xffefdc,2);key.position.set(-3,5,6);scene.add(key);const rim=new THREE.DirectionalLight(0xffffff,2);rim.position.set(3,2,-3);scene.add(rim);const glow=new THREE.PointLight(0xff641b,12,12);glow.position.set(2,-1,3);scene.add(glow);
@@ -106,9 +106,26 @@ canvas.addEventListener('pointermove',event=>{
 });
 canvas.addEventListener('click',event=>{if(hitsLaptop(event))laptopLink.click();});
 
-let currentRatio=1.25,mobile=innerWidth<650,lastMovement=performance.now(),lastP=-1,lastPX=0,lastPY=0;
-function resize(){renderDirty=true;renderer.setSize(host.clientWidth,host.clientHeight,false);camera.aspect=host.clientWidth/host.clientHeight;camera.updateProjectionMatrix();mobile=innerWidth<650;}
+// Resolution: a fixed pixel ratio within a pixel budget. Changing it mid-animation reallocates
+// the canvas and causes a hitch, so it only ever steps down when frames are consistently slow.
+const PIXEL_BUDGET=3e6;
+let ratioCap=2,currentRatio=0,mobile=innerWidth<650;
+function resize(){
+ const w=Math.max(1,host.clientWidth),h=Math.max(1,host.clientHeight);
+ const ratio=Math.round(Math.max(1,Math.min(devicePixelRatio,ratioCap,Math.sqrt(PIXEL_BUDGET/(w*h))))*20)/20;
+ if(ratio!==currentRatio){currentRatio=ratio;renderer.setPixelRatio(ratio);}
+ renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();mobile=innerWidth<650;renderDirty=true;
+}
 new ResizeObserver(resize).observe(host);resize();
+let sampled=0,slow=0,lastRenderAt=0;
+function governFrameRate(now){
+ const gap=lastRenderAt?now-lastRenderAt:0;lastRenderAt=now;
+ if(!gap||gap>100)return;// ignore the first frame and tab switches
+ sampled++;if(gap>20)slow++;
+ if(sampled<90)return;
+ if(slow>15&&currentRatio>1){ratioCap=Math.max(1,currentRatio-.25);resize();}
+ sampled=slow=0;
+}
 
 function pose(now,p){
  const elapsed=(now-start)/1000,turn=smooth(.06,.50,p),zoom=smooth(.53,.96,p),intro=reduced?1:smooth(0,.6,elapsed);
@@ -125,16 +142,12 @@ function pose(now,p){
 }
 
 let lastRenderKey='',lastNow=0;
-function frame(now){requestAnimationFrame(frame);if(document.hidden){lastNow=0;return;}
+function frame(now){requestAnimationFrame(frame);if(document.hidden){lastNow=0;lastRenderAt=0;return;}
  const dt=lastNow?Math.min(.1,(now-lastNow)/1000):1/60;lastNow=now;
- const p=progress();updatePage(p);if(p>=1&&!reduced)return;
- const moving=(!reduced&&now-start<2500)||Math.abs(p-lastP)>.00001||(!reduced&&(Math.abs(px-lastPX)>.0005||Math.abs(py-lastPY)>.0005));
- if(moving)lastMovement=now;lastP=p;lastPX=px;lastPY=py;
- const desiredRatio=now-lastMovement<180?1.25:Math.min(Math.max(devicePixelRatio,2),2.5);
- if(desiredRatio!==currentRatio){currentRatio=desiredRatio;renderer.setPixelRatio(currentRatio);renderDirty=true;}
+ const p=progress();updatePage(p);if(p>=1&&!reduced){lastRenderAt=0;return;}
  const {openAmount,intro}=pose(now,p);updateScreen(now,p,dt);
  const renderKey=[p.toFixed(5),openAmount.toFixed(5),intro.toFixed(5),reduced?0:px.toFixed(4),reduced?0:py.toFixed(4),screenMix.toFixed(4),screenRevision].join(':');
- if(renderDirty||renderKey!==lastRenderKey){renderer.render(scene,camera);lastRenderKey=renderKey;renderDirty=false;}
+ if(renderDirty||renderKey!==lastRenderKey){renderer.render(scene,camera);lastRenderKey=renderKey;renderDirty=false;governFrameRate(now);}else lastRenderAt=0;
 }
 start=modeStarted=performance.now();document.body.classList.remove('booting');
 requestAnimationFrame(frame);
