@@ -270,3 +270,7 @@ html[lang=ar] .tl-card h3{line-height:1.4}
 .word .struck.on::after{transform:scaleX(1)}
 .word .struck.small{font-size:.38em;vertical-align:.95em;color:#8d867a;margin-inline-end:.18em}
 .word .struck.gone{opacity:0}
+/* Filters line up with the project cards, clear of the big year label. */
+@media(min-width:761px){.work .project-filters{padding-inline-start:204px}}
+@media(max-width:760px){.work .project-filters{padding-inline-start:44px}}
+.work-body>.timeline{margin-inline:auto}/* its own margin:0 had undone the centring */

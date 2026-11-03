@@ -33,6 +33,7 @@ const smooth=(a,b,v)=>{const t=clamp((v-a)/(b-a));return t*t*(3-2*t);};
 const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
 const lerp=(a,b,t)=>a+(b-a)*t;
 let active=false;
+const chips=document.querySelector('.project-filters');
 
 // Where the first dot sits in the page. Its track does not stick, so this ignores sticky offsets.
 function targetDot(){
@@ -55,7 +56,7 @@ function clear(){
  if(!active)return;active=false;layer.classList.remove('on');
  for(const el of [srcDot,srcLabel,tgtLabel,ruler,cue,...others])el?.removeAttribute('style');
  const t=targetDot();if(t)t.node.style.opacity='';
- timeline.style.removeProperty('--line-reveal');copyLabelStyle();
+ timeline.style.removeProperty('--line-reveal');copyLabelStyle();chips?.classList.add('chips-in');
 }
 function update(){
  queued=false;
@@ -73,6 +74,9 @@ function update(){
  // Step 1 runs over the first stretch of scrolling after the hand-off (shorter if the timeline is close).
  const span=Math.max(80,Math.min(H*.42,(tgt.y+Math.max(0,d)-holdY)*.8));
  const a=clamp(d/span),fold=smooth(0,.55,a),move=ease(smooth(.25,1,a));
+ // The filter chips rise in once the year label has landed in its column, or as they reach the label's
+ // height, whichever comes first; scrolling back up sends them away again.
+ if(chips&&!reduced){const labelBottom=Math.max(src.y,holdY)+lerp(src.rel.y,labelRel.y,move)+lr.height;chips.classList.toggle('chips-in',a>=.95||chips.getBoundingClientRect().top<=labelBottom);}
  // Step 3: once the real dot reaches the hold line, the line draws down over the next stretch.
  timeline.style.setProperty('--line-reveal',clamp((holdY-tgt.y)/(H*.6)).toFixed(3));
  // Step 1, the ruler: everything folds into the dot; the other years and the hint fade.
@@ -100,10 +104,10 @@ new MutationObserver(queue).observe(document.body,{attributes:true,attributeFilt
 queue();
 
 // Filter chips rise in one after another, with a small turn, as soon as they come into view.
-const chips=document.querySelector('.project-filters');
 if(chips&&!reduced){
  [...chips.children].forEach((chip,i)=>chip.style.setProperty('--i',i));
  chips.classList.add('chips-ready');
- new IntersectionObserver(([entry],io)=>{if(entry.isIntersecting){chips.classList.add('chips-in');io.disconnect();}},{threshold:.3}).observe(chips);
+ // Without the journey they simply rise in when they come into view.
+ new IntersectionObserver(([entry])=>{if(entry.isIntersecting&&!active)chips.classList.add('chips-in');},{threshold:.3}).observe(chips);
 }
 })();
