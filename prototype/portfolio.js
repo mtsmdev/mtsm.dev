@@ -169,3 +169,14 @@ if(matchMedia('(hover: hover) and (pointer: fine)').matches&&!matchMedia('(prefe
 
 // 'Print CV' in the dock: print.css turns the page into a CV.
 document.querySelector('[data-print]')?.addEventListener('click',()=>print());
+
+// Private repos: the link is an email asking for access, with the project and its repos filled in.
+function privateLinks(){
+ const mail=i18n.text().privateMail;
+ for(const link of document.querySelectorAll('.tl-private[data-repos]')){
+  const project=link.closest('.tl-card').querySelector('h3').textContent.trim();
+  const fill=s=>s.replace('{project}',project).replace('{repos}',link.dataset.repos.split(' ').join('\n'));
+  link.href=`mailto:career@mtsm.dev?subject=${encodeURIComponent(fill(mail.subject))}&body=${encodeURIComponent(fill(mail.body))}`;
+ }
+}
+privateLinks();addEventListener('i18nchange',privateLinks);

@@ -30,7 +30,7 @@ const strings={
   'link.website':"Website",
   'link.play':"Google Play",
   'link.private':"Private repo",
-  'link.privateTip':"The code is in a private repository.",
+  'link.privateTip':"Private repository · available on request",
   't.thermavolt.alt0':"The ThermaVoltFlow dashboard with the energy simulation.",
   't.thermavolt.period':"2026",
   't.thermavolt.kind':"Web app",
@@ -118,7 +118,7 @@ const strings={
   'link.website':"الموقع",
   'link.play':"Google Play",
   'link.private':"مستودع خاص",
-  'link.privateTip':"الشيفرة في مستودع خاص.",
+  'link.privateTip':"مستودع خاص · متاح عند الطلب",
   't.thermavolt.alt0':"لوحة تحكم ThermaVoltFlow مع محاكاة الطاقة.",
   't.thermavolt.period':"2026",
   't.thermavolt.kind':"تطبيق ويب",
@@ -185,14 +185,17 @@ const strings={
 const scriptStrings={
  nl:{
   hero:{button:'Bekijk mijn werk',headline:'CODE MET',label:'Bekijk mijn projecten'},
+  privateMail:{subject:'Inzage in de code van {project}',body:'Hoi Moatasem,\n\nIk zou graag de code van {project} willen bekijken:\n{repos}\n\nGroet,'},
   words:['KOFFIE','THEE','CHOCOMELK','IHSAN']
  },
  en:{
   hero:{button:'View my work',headline:'CODE WITH',label:'View my projects'},
+  privateMail:{subject:'Access to the {project} code',body:'Hi Moatasem,\n\nI’d like to take a look at the code for {project}:\n{repos}\n\nBest regards,'},
   words:['COFFEE','TEA','COCOA','IHSAN']
  },
  ar:{
   hero:{button:'شاهد أعمالي',headline:'برمجة',label:'استعرض مشاريعي'},
+  privateMail:{subject:'طلب الاطلاع على شيفرة {project}',body:'مرحبًا معتصم،\n\nأودّ الاطلاع على شيفرة {project}:\n{repos}\n\nمع التحية،'},
   words:['بالقهوة','بالشاي','بالكاكاو','بإحسان']
  }
 };
@@ -207,6 +210,7 @@ function capture(){
  for(const el of document.querySelectorAll('[data-i18n-label]'))dutch[el.dataset.i18nLabel]??=el.getAttribute('aria-label');
  for(const el of document.querySelectorAll('[data-i18n-alt]'))dutch[el.dataset.i18nAlt]??=el.getAttribute('alt');
  for(const el of document.querySelectorAll('[data-i18n-title]'))dutch[el.dataset.i18nTitle]??=el.getAttribute('title');
+ for(const el of document.querySelectorAll('[data-i18n-tip]'))dutch[el.dataset.i18nTip]??=el.dataset.tip;
 }
 const t=key=>(current==='nl'?dutch[key]:strings[current]?.[key])??dutch[key]??'';
 function apply(lang){
@@ -218,6 +222,7 @@ function apply(lang){
  for(const el of document.querySelectorAll('[data-i18n-label]'))el.setAttribute('aria-label',t(el.dataset.i18nLabel));
  for(const el of document.querySelectorAll('[data-i18n-alt]'))el.setAttribute('alt',t(el.dataset.i18nAlt));
  for(const el of document.querySelectorAll('[data-i18n-title]'))el.setAttribute('title',t(el.dataset.i18nTitle));
+ for(const el of document.querySelectorAll('[data-i18n-tip]'))el.dataset.tip=t(el.dataset.i18nTip);
  for(const link of document.querySelectorAll('[data-lang]'))link.setAttribute('aria-current',String(link.dataset.lang===lang));
  // External-link arrows point the reading direction: ↗ in LTR, ↖ in RTL.
  const [from,to]=lang==='ar'?['↗','↖']:['↖','↗'];

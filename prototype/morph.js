@@ -55,8 +55,6 @@ function update(){
  const end=firstYear.getBoundingClientRect().top+scrollY-innerHeight*.28;
  const q=clamp((scrollY-start)/Math.max(1,end-start));
  falloff(q);
- // The filters rise in once the year has landed, and step back if you scroll up again.
- if(chips)chips.classList.toggle('chips-in',q>=.92);
  timeline.style.setProperty('--line-reveal',smooth(.6,1,q).toFixed(3));
  if(q<=0){layer.classList.remove('on');setSources('');setTargets('0');return;}
  if(q>=1){layer.classList.remove('on');setSources('0');setTargets('');return;}
@@ -82,6 +80,6 @@ if(chips&&!reduced){
  [...chips.children].forEach((chip,i)=>chip.style.setProperty('--i',i));
  chips.classList.add('chips-ready');
  // Without the journey (or once a filter hides the first year) the chips simply rise in when seen.
- new IntersectionObserver(([entry])=>{if(entry.isIntersecting&&!active)chips.classList.add('chips-in');},{threshold:.6}).observe(chips);
+ new IntersectionObserver(([entry],io)=>{if(entry.isIntersecting){chips.classList.add('chips-in');io.disconnect();}},{threshold:.3}).observe(chips);
 }
 })();

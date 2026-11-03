@@ -243,3 +243,9 @@ button.dock-item{border:0;background:transparent;font:inherit;font-size:14px;fon
 button.dock-item:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 @media(max-width:600px){button.dock-item{font-size:11px}}
 @media(max-width:600px){.dock-print{flex:1.35}.dock-print span{white-space:nowrap}}
+.work .project-filters .filter-n{font-size:13px;font-variant-numeric:tabular-nums;opacity:.65}
+/* Private repo: a mail link with a tooltip. */
+.tl-private{position:relative;cursor:pointer}
+.tl-private::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 10px);inset-inline-start:0;z-index:5;padding:9px 12px;border-radius:9px;background:var(--bone);color:#17120c;font-size:13px;font-weight:500;white-space:nowrap;box-shadow:0 12px 28px #0008;opacity:0;translate:0 4px;pointer-events:none;transition:opacity .2s,translate .2s}
+.tl-private:hover::after,.tl-private:focus-visible::after{opacity:1;translate:0 0}
+.tl-private:hover{border-color:#ffffff50;color:var(--bone)}
