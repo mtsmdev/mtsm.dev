@@ -25,14 +25,18 @@ The static website is generated in `dist/`. The server is only for local develop
 
 - `prototype/`: website source, styles, and Three.js scene.
 - `prototype/i18n.js`: English and Arabic translations and the language switcher. Dutch is the source text in `index.html`.
-- `prototype/assets/`: CV, project screenshots, and laptop geometry/textures.
+- `prototype/work.css`: type scale, projects timeline, buttons and cursor styles.
+- `prototype/particles.js`, `prototype/cursor.js`: hero particles and the custom cursor.
+- `prototype/assets/`: CV, project screenshots, laptop geometry/textures, and technology logos (`assets/icons/`).
 - `prototype/vendor/`: locally bundled Three.js runtime.
 - `scripts/`: validation and static build.
 - `docs/`: asset provenance and hosting notes.
 
 ## Experience
 
-Projecten is the default view. Mijn CV displays the CV on the laptop and opens the PDF when clicked. Contact displays a custom letter design and opens an email to career@mtsm.dev. Scrolling or choosing Bekijk mijn werk centres the laptop and enters the project section.
+The hero shows its text immediately; a progress ring stands in for the laptop while the model loads. Tabs above the laptop switch its screen between the code editor, the CV and a contact letter, and the laptop can be dragged to spin. A floating dock links the sections, the CV PDF and the language menu.
+
+Scrolling turns the laptop to face you and zooms in until its screen fills the page. The screen carries the real HTML panel that opens the projects section, mapped onto it in perspective, so the page continues without a cut into a timeline of projects and milestones.
 
 The renderer warms up shaders and textures before the intro, renders at a fixed pixel ratio within a pixel budget (stepping down only when frames are consistently slow), and updates the laptop screen in small strips. Reduced-motion preferences are respected.
 
