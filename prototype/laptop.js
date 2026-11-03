@@ -46,12 +46,12 @@ const projectImage=new Image(),amposterImage=new Image(),cvImage=new Image();
 let renderDirty=true,screenDirty=true,screenRevision=0,booted=false;
 function screenArt(){const ctx=projectCtx;
  ctx.fillStyle='#141414';ctx.fillRect(0,0,1600,1000);
- ctx.fillStyle='#eeeae1';ctx.font='600 16px monospace';ctx.fillText('VAN IDEE NAAR WERKENDE SOFTWARE',65,95);
+ ctx.fillStyle='#eeeae1';ctx.font='600 16px monospace';ctx.fillText('PROJECTEN',65,95);
  ctx.font='800 150px "Barlow Condensed",Impact,sans-serif';ctx.fillText('GESELECTEERD',65,282);ctx.fillStyle='#8d8d8d';ctx.fillText('WERK.',65,425);
  ctx.fillStyle='#eeeae1';ctx.fillRect(65,493,1470,1);ctx.font='600 31px "DM Sans",sans-serif';ctx.fillText('ThermaVoltFlow Simulator',65,555);ctx.fillText('Amposter',940,555);
  ctx.font='16px monospace';ctx.fillStyle='#f28b53';ctx.fillText('SVELTE · PHP · LARAVEL · gRPC',65,595);ctx.fillText('REACT · FIREBASE · JAVA',940,595);
  if(projectImage.complete&&projectImage.naturalWidth){ctx.drawImage(projectImage,65,635,800,800*projectImage.naturalHeight/projectImage.naturalWidth);}else{ctx.fillStyle='#d3c8b6';ctx.fillRect(65,635,800,365);}
- ctx.fillStyle='#20221e';ctx.fillRect(920,635,615,365);ctx.fillStyle='#ff7a35';ctx.font='700 43px "DM Sans",sans-serif';ctx.fillText('Amposter',955,705);ctx.fillStyle='#141414';ctx.font='24px "DM Sans",sans-serif';ctx.fillText('Web + Android',955,762);ctx.font='19px "DM Sans",sans-serif';ctx.fillText('Accounts · Profielen · Berichten',955,816);ctx.fillText('Reacties · Groepen',955,855);ctx.fillStyle='#a7aa9a';ctx.font='16px monospace';ctx.fillText('AFZONDERLIJKE SPRING BOOT-BACKEND',955,934);
+ ctx.fillStyle='#20221e';ctx.fillRect(920,635,615,365);ctx.fillStyle='#ff7a35';ctx.font='700 43px "DM Sans",sans-serif';ctx.fillText('Amposter',955,705);ctx.fillStyle='#141414';ctx.font='24px "DM Sans",sans-serif';ctx.fillText('Web + Android',955,762);ctx.font='19px "DM Sans",sans-serif';ctx.fillText('Accounts · Profielen · Berichten',955,816);ctx.fillText('Reacties · Groepen',955,855);ctx.fillStyle='#a7aa9a';ctx.font='16px monospace';ctx.fillText('PLUS EEN SPRING BOOT-BACKEND',955,934);
  if(amposterImage.complete&&amposterImage.naturalWidth){ctx.fillStyle='#d8d0c2';ctx.fillRect(920,635,615,365);ctx.drawImage(amposterImage,920,635,615,615*amposterImage.naturalHeight/amposterImage.naturalWidth);}
  projectTexture.needsUpdate=true;renderDirty=true;
 }

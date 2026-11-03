@@ -4,7 +4,7 @@ const laptopAction=document.getElementById('laptop-action'),primaryAction=docume
 const modeCopy={
  work:{button:'Bekijk mijn werk',headline:['CODE MET','KOFFIE'],href:'#work',label:'Bekijk mijn projecten'},
  cv:{button:'Bekijk mijn CV',headline:['MOATASEM','AL-REFAAI'],href:'assets/moatasem-cv.pdf',label:'Open mijn volledige CV als PDF'},
- contact:{button:'Stuur mij een e-mail',headline:['LATEN WE','PRATEN'],href:'mailto:career@mtsm.dev',label:'Stuur een e-mail naar career@mtsm.dev'}
+ contact:{button:'Mail mij',headline:['LATEN WE','PRATEN'],href:'mailto:career@mtsm.dev',label:'Stuur een e-mail naar career@mtsm.dev'}
 };
 // The last headline word cycles through what the code is made with, typed like in an editor.
 const headlineWords=[{text:'KOFFIE'},{text:'THEE'},{text:'CHOCOMELK'},{text:'IHSAN',tip:true}];

@@ -29,11 +29,11 @@ export function drawMail(ctx){
  ctx.fillStyle=ink;ctx.beginPath();ctx.roundRect(80,65,65,65,16);ctx.fill();
  ctx.fillStyle=paper;ctx.font='bold 39px Arial';ctx.fillText('M',96,112);
  ctx.fillStyle=ink;ctx.font='bold 22px Arial';ctx.fillText('MOATASEM AL-REFAAI',168,92);
- ctx.fillStyle=muted;ctx.font='18px Arial';ctx.fillText('Softwareontwikkelaar · UI / UX',168,123);
+ ctx.fillStyle=muted;ctx.font='18px Arial';ctx.fillText('Software developer · UI / UX',168,123);
  ctx.fillStyle=orange;ctx.beginPath();ctx.arc(1360,98,6,0,Math.PI*2);ctx.fill();
- ctx.fillStyle=ink;ctx.font='bold 17px Arial';ctx.fillText('ZEG HALLO',1382,104);
+ ctx.fillStyle=ink;ctx.font='bold 17px Arial';ctx.fillText('MAIL MIJ',1382,104);
  ctx.strokeStyle='#cec8bc';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(80,169);ctx.lineTo(1520,169);ctx.stroke();
- ctx.fillStyle=orange;ctx.font='bold 19px Arial';ctx.fillText('VAN EEN EERSTE HALLO NAAR IETS MOOIS',85,250);
+ ctx.fillStyle=orange;ctx.font='bold 19px Arial';ctx.fillText('EEN PROJECT, EEN VRAAG OF EEN KOP KOFFIE',85,250);
  ctx.fillStyle=ink;ctx.font='bold 100px "DM Sans",Arial,sans-serif';
  ctx.fillText('Een goed idee',80,376);ctx.fillText('begint met',80,490);
  ctx.fillStyle=orange;ctx.fillText('hallo.',80,604);
@@ -57,6 +57,6 @@ export function drawMail(ctx){
  ctx.fillStyle='#ff8a4e';ctx.beginPath();ctx.moveTo(-210,0);ctx.lineTo(0,156);ctx.lineTo(210,0);ctx.closePath();ctx.fill();
  ctx.fillStyle=ink;ctx.beginPath();ctx.arc(0,139,38,0,Math.PI*2);ctx.fill();ctx.fillStyle=paper;ctx.font='bold 28px Arial';ctx.fillText('M',-12,149);
  ctx.restore();
- ctx.fillStyle=muted;ctx.font='18px Arial';ctx.textAlign='center';ctx.fillText('JOUW VOLGENDE IDEE',1320,850);ctx.fillText('BEGINT HIER.',1320,879);
+ ctx.fillStyle=muted;ctx.font='18px Arial';ctx.textAlign='center';ctx.fillText('TOT SNEL.',1320,865);
  ctx.restore();
 }
