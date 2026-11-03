@@ -9,7 +9,8 @@ const clamp=v=>Math.max(0,Math.min(1,v));
 const smooth=(a,b,v)=>{const t=clamp((v-a)/(b-a));return t*t*(3-2*t);};
 document.body.classList.toggle('reduced',reduced);
 const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:.1});document.querySelectorAll('.reveal').forEach(e=>observer.observe(e));
-window.addEventListener('pointermove',e=>{px=e.clientX/innerWidth-.5;py=e.clientY/innerHeight-.5;},{passive:true});
+// Tilt follows a mouse or pen; touch scrolling must not shake the laptop.
+window.addEventListener('pointermove',e=>{if(e.pointerType==='touch')return;px=e.clientX/innerWidth-.5;py=e.clientY/innerHeight-.5;},{passive:true});
 const heroCopy=document.querySelector('.hero-copy'),annotation=document.querySelector('.annotation'),workReveals=[...work.querySelectorAll('.reveal')];
 let journeyTop=0,journeyEnd=1,lastPageProgress=-1,projectsRevealed=false;
 function measureJourney(){journeyTop=journey.getBoundingClientRect().top+window.scrollY;journeyEnd=Math.max(1,journey.offsetHeight-innerHeight);lastPageProgress=-1;}
@@ -112,13 +113,41 @@ function updateScreen(now,p,dt){
 
 const laptopLink=document.getElementById('laptop-action'),raycaster=new THREE.Raycaster(),hitPointer=new THREE.Vector2();
 function hitsLaptop(event){const box=canvas.getBoundingClientRect();hitPointer.set((event.clientX-box.left)/box.width*2-1,-(event.clientY-box.top)/box.height*2+1);raycaster.setFromCamera(hitPointer,camera);return raycaster.intersectObject(laptop,true).length>0;}
-const hoverBox=new THREE.Box3(),hoverHit=new THREE.Vector3();let lastHover=0;
-canvas.addEventListener('pointermove',event=>{
- if(event.timeStamp-lastHover<65)return;lastHover=event.timeStamp;
+const hoverBox=new THREE.Box3(),hoverHit=new THREE.Vector3();let lastHover=0,overLaptop=false;
+function pointerOverLaptop(event){
  const box=canvas.getBoundingClientRect();hitPointer.set((event.clientX-box.left)/box.width*2-1,-(event.clientY-box.top)/box.height*2+1);raycaster.setFromCamera(hitPointer,camera);
- hoverBox.setFromObject(laptop);canvas.style.cursor=raycaster.ray.intersectBox(hoverBox,hoverHit)?'pointer':'default';
+ hoverBox.setFromObject(laptop);return !!raycaster.ray.intersectBox(hoverBox,hoverHit);
+}
+// Grab and spin: dragging turns the laptop, releasing lets it spring back to its pose.
+const spin={yaw:0,pitch:0,vYaw:0,vPitch:0,dragging:false,id:null,x:0,y:0,moved:0};
+canvas.addEventListener('pointerdown',event=>{
+ if(progress()>.04||!pointerOverLaptop(event))return;
+ spin.dragging=true;spin.id=event.pointerId;spin.x=event.clientX;spin.y=event.clientY;spin.moved=0;spin.vYaw=spin.vPitch=0;
+ canvas.setPointerCapture(event.pointerId);document.body.classList.add('grabbing');
 });
-canvas.addEventListener('click',event=>{if(hitsLaptop(event))laptopLink.click();});
+canvas.addEventListener('pointermove',event=>{
+ if(spin.dragging&&event.pointerId===spin.id){
+  const dx=event.clientX-spin.x,dy=event.clientY-spin.y;spin.x=event.clientX;spin.y=event.clientY;spin.moved+=Math.abs(dx)+Math.abs(dy);
+  spin.yaw=THREE.MathUtils.clamp(spin.yaw+dx*.009,-1.6,1.6);spin.pitch=THREE.MathUtils.clamp(spin.pitch+dy*.004,-.35,.35);
+  return;
+ }
+ if(event.timeStamp-lastHover<65)return;lastHover=event.timeStamp;
+ overLaptop=progress()<.04&&pointerOverLaptop(event);document.body.classList.toggle('over-laptop',overLaptop);
+});
+const release=event=>{if(!spin.dragging||event.pointerId!==spin.id)return;spin.dragging=false;document.body.classList.remove('grabbing');};
+canvas.addEventListener('pointerup',release);canvas.addEventListener('pointercancel',release);
+canvas.addEventListener('pointerleave',()=>{if(!spin.dragging){overLaptop=false;document.body.classList.remove('over-laptop');}});
+// A drag is not a click: only a short tap or click opens the current view.
+canvas.addEventListener('click',event=>{if(spin.moved>6){spin.moved=0;return;}if(hitsLaptop(event))laptopLink.click();});
+function settleSpin(dt){
+ if(spin.dragging||(!spin.yaw&&!spin.pitch))return;
+ // Slightly under-damped spring: a small overshoot reads as weight.
+ const k=38,c=8;
+ spin.vYaw+=(-k*spin.yaw-c*spin.vYaw)*dt;spin.vPitch+=(-k*spin.pitch-c*spin.vPitch)*dt;
+ spin.yaw+=spin.vYaw*dt;spin.pitch+=spin.vPitch*dt;
+ if(Math.abs(spin.yaw)<1e-4&&Math.abs(spin.vYaw)<1e-3)spin.yaw=spin.vYaw=0;
+ if(Math.abs(spin.pitch)<1e-4&&Math.abs(spin.vPitch)<1e-3)spin.pitch=spin.vPitch=0;
+}
 
 // Resolution: a fixed pixel ratio within a pixel budget. Changing it mid-animation reallocates
 // the canvas and causes a hitch, so it only ever steps down when frames are consistently slow.
@@ -189,7 +218,8 @@ function pose(now,p){
  const elapsed=(now-start)/1000,turn=smooth(.06,.50,p),zoom=smooth(.53,.96,p),intro=reduced?1:smooth(0,.6,elapsed);
  const openingTime=clamp(elapsed/2.4),opening=reduced?1:Math.pow(openingTime,4)*(5-4*openingTime),openAmount=Math.max(opening,smooth(0,.15,p));
  laptop.rotation.set(THREE.MathUtils.lerp(THREE.MathUtils.lerp(.15,.12,openAmount),0,turn),THREE.MathUtils.lerp(THREE.MathUtils.lerp(-1.08,-.42,openAmount),0,turn)*side,THREE.MathUtils.lerp(THREE.MathUtils.lerp(-.09,-.055,openAmount),0,turn)*side);
- laptop.rotation.y+=(reduced?0:sx*.08)*(1-turn);laptop.rotation.x+=(reduced?0:sy*.045)*(1-turn);
+ // Pointer tilt (about ±10° of yaw) plus any grab-and-spin offset; both fade out as the laptop turns to the page.
+ laptop.rotation.y+=((reduced?0:sx*.34)+spin.yaw)*(1-turn);laptop.rotation.x+=((reduced?0:sy*.14)+spin.pitch)*(1-turn);
  const tangent=Math.tan(THREE.MathUtils.degToRad(17.5)),startDistance=mobile?10.5:10.8,viewHeight=2*tangent*startDistance,viewWidth=viewHeight*camera.aspect;
  let startScale,startX,startY;
  if(portrait){startScale=fitScale;startX=fitX;startY=fitY;}
@@ -223,8 +253,9 @@ function frame(now){requestAnimationFrame(frame);if(document.hidden){lastNow=0;l
  const dt=lastNow?Math.min(.1,(now-lastNow)/1000):1/60;lastNow=now;
  const p=progress();updatePage(p);if(p>=1&&!reduced){lastRenderAt=0;return;}
  if(reduced){sx=sy=0;}else{sx=THREE.MathUtils.damp(sx,px,6,dt);sy=THREE.MathUtils.damp(sy,py,6,dt);if(Math.abs(sx-px)<1e-4)sx=px;if(Math.abs(sy-py)<1e-4)sy=py;}
+ settleSpin(dt);
  const {openAmount,intro}=pose(now,p);updateScreen(now,p,dt);
- const renderKey=[p.toFixed(5),openAmount.toFixed(5),intro.toFixed(5),sx.toFixed(4),sy.toFixed(4),screenMix.toFixed(4),screenRevision].join(':');
+ const renderKey=[p.toFixed(5),openAmount.toFixed(5),intro.toFixed(5),sx.toFixed(4),sy.toFixed(4),spin.yaw.toFixed(4),spin.pitch.toFixed(4),screenMix.toFixed(4),screenRevision].join(':');
  if(renderDirty||renderKey!==lastRenderKey){renderer.render(scene,camera);lastRenderKey=renderKey;renderDirty=false;governFrameRate(now);}else lastRenderAt=0;
 }
 // The intro clock starts on the first frame the visitor actually sees.

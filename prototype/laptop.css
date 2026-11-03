@@ -14,3 +14,7 @@
 [dir=rtl] .scene-loader{translate:50% -50%}
 @media(max-aspect-ratio:9/10){.scene-loader{inset-inline-start:50%;top:74%}}
 .no-webgl .scene-loader{display:none}
+/* Grab-and-spin affordance on the laptop. */
+.scroll-journey .sculpture canvas{touch-action:pan-y}
+.over-laptop .scroll-journey .sculpture canvas{cursor:grab}
+.grabbing,.grabbing *{cursor:grabbing!important;user-select:none}
