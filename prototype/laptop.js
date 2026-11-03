@@ -168,11 +168,12 @@ measureLaptop();
 function fitPortrait(w,h){
  const distance=mobile?10.5:10.8,perPx=2*Math.tan(THREE.MathUtils.degToRad(17.5))*distance/h;
  fitCam.aspect=w/h;fitCam.updateProjectionMatrix();fitCam.position.set(0,.65,distance);fitCam.lookAt(0,-.01,-.25);fitCam.updateMatrixWorld();
- const bottom=h-96,top=Math.min(freeTop+12,bottom-80);// leave room for the dock
+ // Below the buttons, clear of the dock; on short phones it may tuck behind the dock rather than shrink to a thumbnail.
+ const top=Math.min(freeTop+12,h-176),bottom=Math.min(h-12,Math.max(h-96,top+w*.55));
  const bounds=()=>{
   let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
-  for(let i=0;i<8;i++){
-   corner.set(i&1?fitBox.max.x:fitBox.min.x,i&2?fitBox.max.y:fitBox.min.y,i&4?fitBox.max.z:fitBox.min.z).multiplyScalar(fitScale);
+  for(const point of hull){// the tight outline, as in fitLandscape
+   corner.copy(point).multiplyScalar(fitScale);
    corner.x+=fitX;corner.y+=fitY;corner.project(fitCam);
    const x=(corner.x+1)/2*w,y=(1-corner.y)/2*h;minX=Math.min(minX,x);maxX=Math.max(maxX,x);minY=Math.min(minY,y);maxY=Math.max(maxY,y);
   }
@@ -180,7 +181,7 @@ function fitPortrait(w,h){
  };
  fitScale=1;fitX=0;fitY=0;
  for(let pass=0;pass<4;pass++){
-  let b=bounds();const k=Math.min(w*.92/(b.maxX-b.minX),(bottom-top)/(b.maxY-b.minY));
+  let b=bounds();const k=Math.min(w*.94/(b.maxX-b.minX),(bottom-top)/(b.maxY-b.minY));
   fitScale*=k;fitX*=k;fitY*=k;// zoom about the view centre, then re-centre
   b=bounds();fitX+=(w/2-(b.minX+b.maxX)/2)*perPx;fitY+=((b.minY+b.maxY)/2-(top+bottom)/2)*perPx;
  }
