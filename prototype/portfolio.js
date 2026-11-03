@@ -51,11 +51,11 @@ function startRotator(word,delay,headlineWords){
    later(500,()=>{struck.classList.add('on');later(600,()=>{struck.classList.add('small');later(380,()=>typeAfter(target,after));});});
    return;
   }
-  wrap.classList.remove('typing');markTerm(!!target.tip);later(target.tip?4500:2400,erase);
+  wrap.classList.remove('typing');markTerm(!!target.tip);later(target.tip?6000:3600,erase);
  }
  function typeAfter(target,after){
   if(after.textContent.length<target.then.length){wrap.classList.add('typing');after.textContent=target.then.slice(0,after.textContent.length+1);later(typingDelay(),()=>typeAfter(target,after));return;}
-  wrap.classList.remove('typing');later(2600,erase);
+  wrap.classList.remove('typing');later(3800,erase);
  }
  word.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')openTip();});
  word.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')closeTip();});

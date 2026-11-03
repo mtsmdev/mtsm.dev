@@ -314,10 +314,14 @@ function placeChips(p,now){
   let [ox,oy]=project(Math.min(Math.max(u,.18),.82),Math.min(Math.max(v,.18),.82)),[ax,ay]=project(u,v);
   // A chip tucked behind the lid is placed by its inner edge (data-edge: x for the side, y for the top), so only
   // a sliver hides behind it whatever its width or the laptop's size.
-  if(chip.dataset.edge==='x')ax+=(Math.sign(ax-cx)||1)*(half-16*size);
+  if(chip.dataset.edge==='x'){
+   const dir=Math.sign(ax-cx)||1,overlap=(+chip.dataset.overlap||16)*size;
+   chip._fit=((dir>0?w-ax:ax)-12+overlap)/size;// the widest chip that still keeps its logo in view here
+   ax+=dir*(half-overlap);
+  }
   else if(chip.dataset.edge==='y')ay+=(Math.sign(ay-cy)||-1)*((chipHalfH[i]||19)*size-10*size);
   let x=ox+(ax-ox)*e,y=oy+(ay-oy)*e;
-  x=Math.min(Math.max(x,half+16),w-half-16);y=Math.min(Math.max(y,32),h-130);// on screen, clear of the dock
+  x=Math.min(Math.max(x,half+12),w-half-12);y=Math.min(Math.max(y,32),h-130);// on screen, clear of the dock
   const dx=x-cx,dy=y-cy,len=Math.hypot(dx,dy)||1,tx=x+dx/len*90*spread,ty=y+dy/len*90*spread;
   const opacity=Math.max(0,Math.min(1,pop*1.6)*(1-smooth(.05,.22,p)));
   // One transform per chip, written only when it changed: per-frame style writes cost recalcs.
@@ -335,8 +339,13 @@ const stack={
 stack.any=[...stack.lang,...stack.framework,...stack.tools];
 const swapOut=[{opacity:1,transform:'none',filter:'blur(0)'},{opacity:0,transform:'translateY(-7px)',filter:'blur(3px)'}];
 const swapIn=[{opacity:0,transform:'translateY(7px)',filter:'blur(3px)'},{opacity:1,transform:'none',filter:'blur(0)'}];
+let measure=null;
+const chipWidth=name=>{// logo, gap, padding and border around the text
+ if(!measure){measure=document.createElement('canvas').getContext('2d');measure.font=getComputedStyle(chips[0].firstElementChild).font;}
+ return measure.measureText(name).width+52;
+};
 async function swapChip(chip,i){
- const shown=new Set(chips.map(c=>c.dataset.name)),options=stack[chip.dataset.kind].filter(([name])=>!shown.has(name));
+ const shown=new Set(chips.map(c=>c.dataset.name)),options=stack[chip.dataset.kind].filter(([name])=>!shown.has(name)&&(!chip._fit||chipWidth(name)<=chip._fit));
  if(!options.length)return;
  const [name,icon,hex]=options[Math.random()*options.length|0],float=chip.firstElementChild,face=float.firstElementChild,from=float.offsetWidth;
  if(!from)return;// hidden on this layout
@@ -348,10 +357,13 @@ async function swapChip(chip,i){
  float.animate([{width:from+'px'},{width:to+'px'}],{duration:420,easing:'cubic-bezier(.16,1,.3,1)'});// the pill eases to its new size
  face.animate(swapIn,{duration:360,easing:'cubic-bezier(.16,1,.3,1)'});
 }
-const rotateLater=(chip,i)=>setTimeout(()=>{if(chipsShown&&!document.hidden)swapChip(chip,i);rotateLater(chip,i);},3000+Math.random()*7000);
+const rotateLater=(chip,i)=>setTimeout(()=>{if(chipsShown&&!document.hidden)swapChip(chip,i);rotateLater(chip,i);},10000+Math.random()*15000);
 if(!reduced)setTimeout(()=>{
  for(const [,icon] of stack.any)new Image().src=`assets/icons/${icon}.svg`;// so a new logo never pops in late
- chips.forEach(rotateLater);
+ chips.forEach((chip,i)=>{
+  if(chip._fit&&chipWidth(chip.dataset.name)>chip._fit)swapChip(chip,i);// too wide for the gap beside the lid here
+  rotateLater(chip,i);
+ });
 },4000);// after the chips have popped out
 const layoutObserver=new ResizeObserver(resize);layoutObserver.observe(host);layoutObserver.observe(heroCopy);resize();
 // A language switch mirrors the scene for RTL and redraws every screen once its fonts are loaded.
