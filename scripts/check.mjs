@@ -5,7 +5,7 @@ import {execFileSync} from 'node:child_process';
 
 const root=fileURLToPath(new URL('../',import.meta.url));
 const source=path.join(root,'prototype');
-const modules=['i18n.js','portfolio.js','laptop.js','laptop-views.js','editor-screen.js','xps-reference.js','server.cjs'];
+const modules=['i18n.js','portfolio.js','particles.js','laptop.js','laptop-views.js','editor-screen.js','xps-reference.js','server.cjs'];
 for(const file of modules)execFileSync(process.execPath,['--check',path.join(source,file)],{stdio:'inherit'});
 const html=await readFile(path.join(source,'index.html'),'utf8');
 const assets=[...html.matchAll(/(?:src|href)="([^"#]+)"/g)].map(match=>match[1]).filter(value=>!/^https?:|^mailto:|^tel:|^[?]/.test(value));
