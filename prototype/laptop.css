@@ -1,0 +1,10 @@
+.scroll-journey{height:340svh;position:relative}.scroll-journey .hero{position:sticky;top:0;height:100svh;min-height:0;max-height:none}.scroll-journey .sculpture{inset:0;width:100%;height:100%;cursor:default;pointer-events:none;opacity:1}.scroll-journey .hero-copy{padding-top:clamp(155px,22vh,230px)}.scroll-journey .hero-copy,.scroll-journey .annotation,.scroll-journey .hero-bottom,.scroll-journey .drag-label{will-change:opacity,transform}.work{position:relative;z-index:4;margin-top:-100svh;opacity:0;will-change:transform,opacity}.control-state{min-width:135px}.no-webgl .work{opacity:1!important;transform:none!important}.no-webgl .scroll-journey{height:100svh}.no-webgl .work{margin-top:0}.reduced .scroll-journey{height:100svh}.reduced .work{margin-top:0;opacity:1!important;transform:none!important}.scroll-journey .annotation,.scroll-journey .drag-label,.scroll-journey .hero-bottom{z-index:2}
+@media(max-width:600px){.scroll-journey{height:300svh}.scroll-journey .hero-copy{padding-top:115px}.scroll-journey .annotation{top:auto;bottom:155px;left:5%}.scroll-journey .drag-label{bottom:150px}.control-state{display:none}}
+/* Text and lid share the same start after the model and its textures are ready. */
+header,.scroll-journey .hero-copy,.scroll-journey .annotation,.scroll-journey .drag-label,.scroll-journey .hero-bottom{transition:opacity 1s ease}
+.booting header,.booting .scroll-journey .hero-copy,.booting .scroll-journey .annotation,.booting .scroll-journey .drag-label,.booting .scroll-journey .hero-bottom{opacity:0!important;pointer-events:none!important;visibility:hidden!important}
+.scroll-journey .enter,.scroll-journey .line>span{animation:none}
+.scroll-journey .line>span{transform:translateY(0);transition:transform 1.8s cubic-bezier(.19,1,.22,1)}
+.scroll-journey .line:nth-child(2)>span{transition-delay:0s}
+.booting .scroll-journey .line>span{transform:translateY(110%);transition:none}
+.booting header,.booting .scroll-journey .hero-copy,.booting .scroll-journey .annotation,.booting .scroll-journey .drag-label,.booting .scroll-journey .hero-bottom{transition:none}
