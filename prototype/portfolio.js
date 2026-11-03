@@ -95,6 +95,11 @@ function renderHero(){
   line.append(content);return line;
  }));
  const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ if(reducedMotion&&words[0].then){
+  const struck=document.createElement('span');struck.className='struck on small';struck.textContent=words[0].text;
+  const after=document.createElement('span');after.className='after';after.textContent=words[0].then;
+  rotatingWord.replaceChildren(struck,after);
+ }
  if(!reducedMotion)whenIntroDone(delay=>{if(rotatingWord.isConnected&&!rotator)rotator=startRotator(rotatingWord,delay,words);});
 }
 let journeyFrame=null;

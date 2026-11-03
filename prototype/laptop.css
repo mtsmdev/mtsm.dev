@@ -37,7 +37,7 @@
 @keyframes chip-float{from{translate:0 -6px}to{translate:0 7px}}
 @media(max-width:899px),(max-aspect-ratio:9/10),(max-height:600px){.skill-orbit{display:none}}
 @media(prefers-reduced-motion:reduce){.skill-float{animation:none}}
-.reduced .skill-orbit{display:none}
+.reduced .skill-float{animation:none}/* chips stay, but still */
 /* The back layer sits under the laptop canvas, so the lid partly covers those chips. */
 .skill-orbit-back{z-index:0}
 .skill-orbit-back .skill-float{background:#17150fe6;color:#bdb5a7}
