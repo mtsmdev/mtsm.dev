@@ -32,6 +32,8 @@
 .skill-chip{position:absolute;left:0;top:0;translate:-50% -50%;transform:translate(-999px,-999px);will-change:transform;opacity:0}
 .skill-float{display:inline-flex;align-items:center;gap:8px;padding:8px 14px 8px 10px;border-radius:999px;background:#1c1a16f2;border:1px solid #ffffff1a;box-shadow:0 12px 30px -12px #000c,inset 0 1px 0 #ffffff0d;color:#e3dbcd;font-size:14px;font-weight:500;white-space:nowrap;animation:chip-float var(--float) ease-in-out calc(var(--i)*-.7s) infinite alternate}
 .skill-float .tech-logo{width:18px;height:18px}
+.skill-float{overflow:hidden}
+.chip-face{display:inline-flex;align-items:center;gap:8px}
 @keyframes chip-float{from{translate:0 -6px}to{translate:0 7px}}
 @media(max-width:899px),(max-aspect-ratio:9/10),(max-height:600px){.skill-orbit{display:none}}
 @media(prefers-reduced-motion:reduce){.skill-float{animation:none}}

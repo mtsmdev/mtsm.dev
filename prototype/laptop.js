@@ -307,6 +307,9 @@ function placeChips(p,now){
   const pop=reduced?1:clamp((now-start-2500-i*160)/650),e=popEase(pop);
   // From a point just inside the screen to the chip's spot outside it.
   let half=chipHalf[i]||60;
+  if(chip._half){// follow the pill while it eases to a new width
+   const k=clamp((now-chip._half.t0)/420);half=chip._half.from+(chip._half.to-chip._half.from)*(1-Math.pow(1-k,4));if(k>=1)chip._half=null;
+  }
   half*=size;
   let [ox,oy]=project(Math.min(Math.max(u,.18),.82),Math.min(Math.max(v,.18),.82)),[ax,ay]=project(u,v);
   // A chip tucked behind the lid is placed by its inner edge (data-edge: x for the side, y for the top), so only
@@ -322,6 +325,34 @@ function placeChips(p,now){
   if(chip._key!==key){chip._key=key;chip.style.transform=`translate(${tx.toFixed(1)}px,${ty.toFixed(1)}px) scale(${size.toFixed(2)})`;chip.style.opacity=opacity.toFixed(2);}
  });
 }
+// Every few seconds a chip shows another piece of the stack from its own slot: a language, a framework,
+// a devops tool, and one from anywhere. Never two of the same at once.
+const stack={
+ lang:[['TypeScript','typescript','3178C6'],['JavaScript','javascript','F7DF1E'],['Python','python','3776AB'],['PHP','php','777BB4'],['Java','java','ED8B00']],
+ framework:[['React','react','61DAFB'],['Angular','angular','DD0031'],['Laravel','laravel','FF2D20'],['Spring Boot','springboot','6DB33F'],['Svelte','svelte','FF3E00'],['Node.js','nodedotjs','5FA04E'],['Tailwind CSS','tailwindcss','06B6D4']],
+ tools:[['Docker','docker','2496ED'],['GitHub Actions','githubactions','2088FF'],['Cloudflare Workers','cloudflareworkers','F38020'],['PostgreSQL','postgresql','4169E1'],['Redis','redis','FF4438'],['Vite','vite','9135FF'],['Firebase','firebase','DD2C00']],
+};
+stack.any=[...stack.lang,...stack.framework,...stack.tools];
+const swapOut=[{opacity:1,transform:'none',filter:'blur(0)'},{opacity:0,transform:'translateY(-7px)',filter:'blur(3px)'}];
+const swapIn=[{opacity:0,transform:'translateY(7px)',filter:'blur(3px)'},{opacity:1,transform:'none',filter:'blur(0)'}];
+async function swapChip(chip,i){
+ const shown=new Set(chips.map(c=>c.dataset.name)),options=stack[chip.dataset.kind].filter(([name])=>!shown.has(name));
+ if(!options.length)return;
+ const [name,icon,hex]=options[Math.random()*options.length|0],float=chip.firstElementChild,face=float.firstElementChild,from=float.offsetWidth;
+ if(!from)return;// hidden on this layout
+ chip.dataset.name=name;
+ await face.animate(swapOut,{duration:220,easing:'ease-in'}).finished;
+ chip.style.setProperty('--brand','#'+hex);
+ face.innerHTML=`<span class="tech-logo" style="--logo:url(assets/icons/${icon}.svg)"></span>${name}`;
+ const to=float.offsetWidth;chip._half={from:from/2,to:to/2,t0:performance.now()};chipHalf[i]=to/2;
+ float.animate([{width:from+'px'},{width:to+'px'}],{duration:420,easing:'cubic-bezier(.16,1,.3,1)'});// the pill eases to its new size
+ face.animate(swapIn,{duration:360,easing:'cubic-bezier(.16,1,.3,1)'});
+}
+const rotateLater=(chip,i)=>setTimeout(()=>{if(chipsShown&&!document.hidden)swapChip(chip,i);rotateLater(chip,i);},3000+Math.random()*7000);
+if(!reduced)setTimeout(()=>{
+ for(const [,icon] of stack.any)new Image().src=`assets/icons/${icon}.svg`;// so a new logo never pops in late
+ chips.forEach(rotateLater);
+},4000);// after the chips have popped out
 const layoutObserver=new ResizeObserver(resize);layoutObserver.observe(host);layoutObserver.observe(heroCopy);resize();
 // A language switch mirrors the scene for RTL and redraws every screen once its fonts are loaded.
 window.addEventListener('i18nchange',async()=>{
