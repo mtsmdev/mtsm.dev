@@ -57,8 +57,10 @@ h1{font-size:clamp(60px,8.4vw,148px)}
 .timeline{--label-fs:clamp(44px,4.4vw,68px);--label-mid:calc(var(--label-fs)*.45);--sticky-top:clamp(24px,6vh,64px);--year-col:132px;--gap:72px;--spine:calc(var(--year-col) + var(--gap)/2);position:relative;list-style:none;margin:0;padding:0}
 .timeline::before,.timeline::after{content:'';position:absolute;z-index:0;top:var(--spine-top,37px);bottom:var(--spine-bottom,0px);inset-inline-start:calc(var(--spine) - 1px);width:2px;border-radius:2px;pointer-events:none}
 .timeline::before{background:var(--line-2)}
-/* The spine draws down from the first dot after the morph (morph.js sets --line-reveal). */
-.timeline::before,.timeline::after{clip-path:inset(0 0 calc((1 - var(--line-reveal,1)) * 100%) 0)}
+/* The spine is drawn by the dot of the morph (morph.js sets --line-pen, in px from the spine's top). */
+.timeline::before,.timeline::after{clip-path:inset(0 0 max(0px,calc(100% - var(--line-pen,100%))) 0);-webkit-mask:linear-gradient(transparent,#000 var(--spine-fade),#000 calc(100% - var(--spine-fade)),transparent);mask:linear-gradient(transparent,#000 var(--spine-fade),#000 calc(100% - var(--spine-fade)),transparent)}
+.timeline{--spine-fade:96px}
+@media(max-width:760px){.timeline{--spine-fade:64px}}
 .timeline::after{background:linear-gradient(var(--orange),#ff641b88);transform-origin:top;scale:1 0}
 @supports ((animation-timeline:view()) and (animation-range:0% 100%)){
  .timeline::after{animation:spine-fill linear both;animation-timeline:view();animation-range:cover 0% cover 85%}
@@ -76,8 +78,7 @@ h1{font-size:clamp(60px,8.4vw,148px)}
 /* A project's dot rides down its card (like the year label) and stops at the card's end. */
 .tl-track{position:absolute;z-index:2;top:0;bottom:0;inset-inline-start:calc(var(--gap)/-2 - 7px);width:14px;pointer-events:none}
 .tl-track .tl-node{position:sticky;inset:auto;top:calc(var(--sticky-top) + var(--label-mid) - 7px);display:block;margin-top:calc(var(--label-mid) - 7px)}
-/* The last dot stays put, so it never slides off the end of the spine. */
-.tl-item.is-last .tl-track .tl-node{position:relative;top:0}
+
 .tl-item.in-view .tl-node{border-color:var(--orange);background:var(--orange);box-shadow:0 0 0 6px #ff641b22}
 .tl-node-icon{top:50%;translate:0 -50%;inset-inline-start:calc(var(--gap)/-2 - 19px);width:38px;height:38px;display:grid;place-items:center;color:var(--muted);background:#1d1b17;border:1px solid var(--line-2)}
 .tl-node-icon .icon{width:18px;height:18px}
@@ -304,7 +305,8 @@ html[lang=ar] .tl-card h3{line-height:1.4}
 }
 /* The ruler's line is its own layer, so the morph can fold the line without squashing the dots and markers. */
 .work-ruler{position:relative;border-top-color:transparent}
-.work-ruler::before{content:'';position:absolute;inset-inline:0;top:-1px;height:1px;background:var(--line-2);transform-origin:var(--fold-x,0) 0;scale:var(--line-scale,1) 1;opacity:var(--line-alpha,1)}
+.work-ruler{--ruler-ext:max(5cqw,28px)}
+.work-ruler::before{content:'';position:absolute;inset-inline:calc(var(--ruler-ext)*-1);top:-1px;height:1px;background:var(--line-2);-webkit-mask:linear-gradient(90deg,transparent,#000 var(--ruler-ext),#000 calc(100% - var(--ruler-ext)),transparent);mask:linear-gradient(90deg,transparent,#000 var(--ruler-ext),#000 calc(100% - var(--ruler-ext)),transparent);transform-origin:calc(var(--fold-x,0px) + var(--ruler-ext)) 0;scale:var(--line-scale,1) 1;opacity:var(--line-alpha,1)}
 /* The timeline overlaps the bottom of the panel, so it paints above the hero. */
 .journey-on .work-body{position:relative;z-index:5}
 /* The cursor swallowed by a call to action: it shrinks into the button and a small ring chases the pointer inside. */

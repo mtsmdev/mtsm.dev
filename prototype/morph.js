@@ -59,7 +59,7 @@ function clear(){
  if(!active)return;active=false;layer.classList.remove('on');
  for(const el of [srcDot,srcLabel,tgtLabel,ruler,cue,...others,...heading])el?.removeAttribute('style');lastAway='0';
  const t=targetDot();if(t)t.node.style.opacity='';
- timeline.style.removeProperty('--line-reveal');copyLabelStyle();chips?.classList.add('chips-in');
+ timeline.style.removeProperty('--line-pen');copyLabelStyle();chips?.classList.add('chips-in');
 }
 function update(){
  queued=false;
@@ -84,7 +84,10 @@ function update(){
  if(chips&&!reduced&&narrow)chips.classList.toggle('chips-in',chips.getBoundingClientRect().top<H*.92);
  else if(chips&&!reduced){const labelBottom=Math.max(src.y,holdY)+lerp(src.rel.y,labelRel.y,move)+lr.height;chips.classList.toggle('chips-in',a>=.95||chips.getBoundingClientRect().top<=labelBottom);}
  // Step 3: once the real dot reaches the hold line, the line draws down over the next stretch.
- timeline.style.setProperty('--line-reveal',clamp(narrow?(d-span)/(H*.6):(holdY-tgt.y)/(H*.6)).toFixed(3));
+ // The spine is drawn by the dot: down to wherever the travelling dot is (its faded lead-in included),
+ // and once the real dot has taken over, on down the rest of the timeline.
+ const spineTop=timeline.getBoundingClientRect().top+(parseFloat(timeline.style.getPropertyValue('--spine-top'))||0);
+ const drawn=clamp(narrow?(d-span)/(H*.6):(holdY-tgt.y)/(H*.6));
  // Step 1, the ruler: everything folds into the dot; the other years and the hint fade.
  // Only the line is scaled; the other years and their markers slide in at full size (never squashed) and
  // fade as they close in on each other.
@@ -102,14 +105,16 @@ function update(){
  if(away!==lastAway){lastAway=away;for(const el of heading){el.style.opacity=away==='0'?'':1-away;el.style.transform=away==='0'?'':`translateY(${(-28*away).toFixed(1)}px)`;}}
  // On phones the year label is simply part of the timeline; only the dot travels.
  const targetLabel=narrow?'':'0';
- if(d<=0){layer.classList.remove('on');setSources('');setTargets('0',tgt.node,targetLabel);return;}
- if(narrow?a>=1:tgt.y<=holdY){layer.classList.remove('on');setSources('0');setTargets('',tgt.node);return;}
+ const pen=v=>timeline.style.setProperty('--line-pen',Math.max(0,v).toFixed(1)+'px');
+ if(d<=0){pen(0);layer.classList.remove('on');setSources('');setTargets('0',tgt.node,targetLabel);return;}
+ if(narrow?a>=1:tgt.y<=holdY){pen(tgt.y-spineTop+drawn*timeline.offsetHeight);layer.classList.remove('on');setSources('0');setTargets('',tgt.node);return;}
  setSources('0');setTargets('0',tgt.node,targetLabel);layer.classList.add('on');
  label.style.visibility=narrow?'hidden':'';
  if(narrow)srcLabel.style.opacity=(1-smooth(0,.3,a)).toFixed(3);
  // Step 2, the travelling dot: sideways during step 1, riding up with the page until the hold line.
  // On phones it goes straight to the real dot instead of holding.
  const x=lerp(src.x,tgt.x,move),y=narrow?lerp(src.y,tgt.y,move):Math.max(src.y,holdY),size=lerp(src.size,tgt.size,move);
+ pen(y-spineTop);
  dot.style.width=dot.style.height=size.toFixed(2)+'px';
  dot.style.transform=`translate(${(x-size/2).toFixed(1)}px,${(y-size/2).toFixed(1)}px)`;
  // Its label moves from under the ruler dot to beside the timeline dot, growing as it goes.
