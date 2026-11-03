@@ -241,7 +241,7 @@ html[lang=ar] .contact h2{font-size:clamp(44px,6.4vw,104px)}
 .work-ruler li{will-change:transform,opacity}
 /* Filter chips: rise, turn and fade in one by one. */
 .project-filters.chips-ready button{opacity:0;translate:0 22px;rotate:-5deg;transition:opacity .6s var(--ease-out),translate .8s var(--ease-out),rotate .8s var(--ease-out),background .25s,color .25s,border-color .25s;transition-delay:calc(var(--i,0)*90ms),calc(var(--i,0)*90ms),calc(var(--i,0)*90ms),0s,0s,0s}
-[dir=rtl] .project-filters.chips-ready button{rotate:5deg}
+[dir=rtl] .project-filters.chips-ready:not(.chips-in) button{rotate:5deg}
 .project-filters.chips-in button{opacity:1;translate:0 0;rotate:0deg}
 button.dock-item{border:0;background:transparent;font:inherit;font-size:14px;font-weight:500;cursor:pointer}
 button.dock-item:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
