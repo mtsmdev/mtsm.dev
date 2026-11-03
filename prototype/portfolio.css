@@ -63,14 +63,6 @@
 .annotation{font-size:11px}.annotation .fine{font-size:9px}
 @media(max-width:600px){.annotation{font-size:9px}.annotation .fine{font-size:7px}}
 
-/* A clean solid action with restrained corner rounding and an integrated arrow. */
-.hero .primary{position:relative;isolation:isolate;overflow:hidden;border-radius:7px;padding:18px 23px;min-height:57px;gap:34px;align-items:center;border:1px solid #ffb48730;background:#f87936;color:#181510;box-shadow:inset 0 1px 0 #ffffff20,0 3px 10px #0002;font-weight:600;transition:background .25s,transform .25s,box-shadow .25s}
-.hero .primary>span{display:grid;place-items:center;width:23px;height:23px;flex:0 0 23px;background:transparent;color:inherit;font-size:24px;line-height:1;transition:transform .3s cubic-bezier(.2,.7,.2,1)}
-.hero .primary:hover{background:#ff8a4e;transform:translateY(-2px);box-shadow:inset 0 1px 0 #ffffff30,0 7px 20px #0003}
-.hero .primary:hover>span{transform:translate(3px,-2px)}
-.hero .primary:active{transform:translateY(0)}
-.hero .primary:focus-visible{outline:2px solid #f6e8d8;outline-offset:5px}
-@media(max-width:600px){.hero .primary{padding:14px 19px;min-height:49px;gap:25px}.hero .primary>span{width:21px;height:21px;flex-basis:21px;font-size:22px}}
 
 /* Rotating last headline word, typed with an editor-style caret. */
 .word-wrap{white-space:nowrap}
@@ -118,7 +110,7 @@ footer{padding-bottom:70px}
  .scroll-journey h1{font-size:min(11vw,19vh)}
  .hero .eyebrow{margin-bottom:10px}
  .hero .intro{font-size:13px;line-height:1.5;margin:12px 0 14px;max-width:330px}
- .hero .primary{min-height:44px;padding:11px 16px}
+ .hero .btn-primary,.hero .btn-ghost{min-height:46px}.hero .btn-primary .btn-icon{width:34px;height:34px}
  .scroll-journey .annotation{display:none}
 }
 
