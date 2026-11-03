@@ -112,14 +112,44 @@ canvas.addEventListener('click',event=>{if(hitsLaptop(event))laptopLink.click();
 // Resolution: a fixed pixel ratio within a pixel budget. Changing it mid-animation reallocates
 // the canvas and causes a hitch, so it only ever steps down when frames are consistently slow.
 const PIXEL_BUDGET=3e6;
-let ratioCap=2,currentRatio=0,mobile=innerWidth<650;
+let ratioCap=2,currentRatio=0,mobile=innerWidth<650,portrait=false,freeTop=0;
+const heroActions=document.querySelector('.hero .actions');
 function resize(){
  const w=Math.max(1,host.clientWidth),h=Math.max(1,host.clientHeight);
  const ratio=Math.round(Math.max(1,Math.min(devicePixelRatio,ratioCap,Math.sqrt(PIXEL_BUDGET/(w*h))))*20)/20;
  if(ratio!==currentRatio){currentRatio=ratio;renderer.setPixelRatio(ratio);}
- renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();mobile=innerWidth<650;renderDirty=true;
+ renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();mobile=innerWidth<650;
+ // On portrait screens the laptop sits in the free space below the hero buttons.
+ portrait=camera.aspect<.9;freeTop=heroActions?heroCopy.offsetTop+heroActions.offsetTop+heroActions.offsetHeight:0;
+ if(portrait)fitPortrait(w,h);
+ renderDirty=true;
 }
-new ResizeObserver(resize).observe(host);resize();
+// Fit the opened laptop into the free space below the hero buttons. The corners of its bounding
+// box are projected through the starting camera, so perspective is accounted for exactly.
+const fitBox=new THREE.Box3(),fitCam=new THREE.PerspectiveCamera(35,1,.03,100),corner=new THREE.Vector3();
+let fitScale=1,fitX=0,fitY=0;
+laptop.rotation.set(.12,-.42,-.055);lid.rotation.x=0;laptop.updateMatrixWorld(true);fitBox.setFromObject(laptop);
+function fitPortrait(w,h){
+ const distance=mobile?10.5:10.8,perPx=2*Math.tan(THREE.MathUtils.degToRad(17.5))*distance/h;
+ fitCam.aspect=w/h;fitCam.updateProjectionMatrix();fitCam.position.set(0,.65,distance);fitCam.lookAt(0,-.01,-.25);fitCam.updateMatrixWorld();
+ const bottom=h-(h<720?16:90),top=Math.min(freeTop+16,bottom-80);// short screens hide the annotation
+ const bounds=()=>{
+  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+  for(let i=0;i<8;i++){
+   corner.set(i&1?fitBox.max.x:fitBox.min.x,i&2?fitBox.max.y:fitBox.min.y,i&4?fitBox.max.z:fitBox.min.z).multiplyScalar(fitScale);
+   corner.x+=fitX;corner.y+=fitY;corner.project(fitCam);
+   const x=(corner.x+1)/2*w,y=(1-corner.y)/2*h;minX=Math.min(minX,x);maxX=Math.max(maxX,x);minY=Math.min(minY,y);maxY=Math.max(maxY,y);
+  }
+  return {minX,maxX,minY,maxY};
+ };
+ fitScale=1;fitX=0;fitY=0;
+ for(let pass=0;pass<4;pass++){
+  let b=bounds();const k=Math.min(w*.92/(b.maxX-b.minX),(bottom-top)/(b.maxY-b.minY));
+  fitScale*=k;fitX*=k;fitY*=k;// zoom about the view centre, then re-centre
+  b=bounds();fitX+=(w/2-(b.minX+b.maxX)/2)*perPx;fitY+=((b.minY+b.maxY)/2-(top+bottom)/2)*perPx;
+ }
+}
+const layoutObserver=new ResizeObserver(resize);layoutObserver.observe(host);layoutObserver.observe(heroCopy);resize();
 let sampled=0,slow=0,lastRenderAt=0;
 function governFrameRate(now){
  const gap=lastRenderAt?now-lastRenderAt:0;lastRenderAt=now;
@@ -136,11 +166,15 @@ function pose(now,p){
  const openingTime=clamp(elapsed/2.4),opening=reduced?1:Math.pow(openingTime,4)*(5-4*openingTime),openAmount=Math.max(opening,smooth(0,.15,p));
  laptop.rotation.set(THREE.MathUtils.lerp(THREE.MathUtils.lerp(.15,.12,openAmount),0,turn),THREE.MathUtils.lerp(THREE.MathUtils.lerp(-1.08,-.42,openAmount),0,turn),THREE.MathUtils.lerp(THREE.MathUtils.lerp(-.09,-.055,openAmount),0,turn));
  laptop.rotation.y+=(reduced?0:sx*.08)*(1-turn);laptop.rotation.x+=(reduced?0:sy*.045)*(1-turn);
- const tangent=Math.tan(THREE.MathUtils.degToRad(17.5)),startDistance=mobile?10.5:10.8,viewWidth=2*tangent*startDistance*camera.aspect,initialScale=Math.min(1.18,viewWidth*.36/4.7);
- laptop.scale.setScalar(THREE.MathUtils.lerp(initialScale,1,turn));
- laptop.position.set(THREE.MathUtils.lerp(viewWidth*.265,0,turn),THREE.MathUtils.lerp(mobile?-1.3:-.1,-.01,turn)-(1-intro)*.12,0);
- const destination=Math.min(1.4125/tangent,2.26/(tangent*camera.aspect))*.84;
- camera.position.set(0,THREE.MathUtils.lerp(.65,-.01,turn),THREE.MathUtils.lerp(startDistance,destination,zoom));camera.lookAt(0,-.01,-.25);
+ const tangent=Math.tan(THREE.MathUtils.degToRad(17.5)),startDistance=mobile?10.5:10.8,viewHeight=2*tangent*startDistance,viewWidth=viewHeight*camera.aspect;
+ let startScale,startX,startY;
+ if(portrait){startScale=fitScale;startX=fitX;startY=fitY;}
+ else{startScale=Math.min(innerHeight<520?.78:.95,viewWidth*.36/4.7);startX=viewWidth*.265;startY=mobile?-1.3:innerHeight<520?-.35:-.1;}// short landscape: clear the header
+ laptop.scale.setScalar(THREE.MathUtils.lerp(startScale,1,turn));
+ laptop.position.set(THREE.MathUtils.lerp(startX,0,turn),THREE.MathUtils.lerp(startY,-.01,turn)-(1-intro)*.12,0);
+ // Landscape zooms until the screen covers the view; portrait fits the screen's width instead of cropping it.
+ const destination=portrait?Math.max(1.4125/tangent,2.26/(tangent*camera.aspect))*1.04:Math.min(1.4125/tangent,2.26/(tangent*camera.aspect))*.84;
+ camera.position.set(0,THREE.MathUtils.lerp(.65,-.01,turn),THREE.MathUtils.lerp(startDistance,destination,portrait?turn:zoom));camera.lookAt(0,-.01,-.25);
  lid.rotation.x=THREE.MathUtils.lerp(THREE.MathUtils.degToRad(99.6)*(1-openAmount),.16,turn);
  return {openAmount,intro};
 }

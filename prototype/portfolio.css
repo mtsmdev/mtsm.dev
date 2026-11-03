@@ -101,6 +101,7 @@ nav a[aria-current=page]{color:var(--orange)}
 .source-links{font-size:11px}
 footer>div{font-size:11px}
 footer{padding-bottom:70px}
+@media(max-aspect-ratio:9/10){.scroll-journey .annotation{top:auto;bottom:34px;left:5%;right:auto}}
 @media(pointer:coarse){
  nav a,.case-links a,.source-links a,.archive-body a,.profile-links a,footer>div a,.hero .text-link{position:relative}
  nav a::after,.case-links a::after,.source-links a::after,.archive-body a::after,.profile-links a::after,footer>div a::after,.hero .text-link::after{content:'';position:absolute;inset:-12px -8px}
@@ -114,6 +115,7 @@ footer{padding-bottom:70px}
  footer>div{display:grid;grid-template-columns:1fr 1fr;gap:18px 16px;font-size:12px}
  footer{padding-bottom:50px}
 }
+@media(max-aspect-ratio:9/10) and (max-height:719px){.scroll-journey .annotation{display:none}}
 /* Phones held sideways: a short hero that still fits headline, intro and buttons. */
 @media(orientation:landscape) and (max-height:520px){
  header{height:64px}.logo{font-size:32px}
