@@ -6,8 +6,6 @@
 .scroll-journey .sculpture canvas{pointer-events:auto}
 .laptop-action{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;pointer-events:none}
 .sculpture:focus-within{outline:2px solid var(--orange);outline-offset:-10px}
-nav a[aria-current=page]{color:var(--orange)}
-@media(max-width:600px){nav a:nth-child(2){display:block}nav{gap:14px}.brand{gap:8px}nav a{font-size:10px}}
 /* Compact project layouts with the same dark palette as the hero. */
 .work{background:#141414;color:#eeeae7;padding:70px 5% 85px}
 .work .section-top{border-bottom:1px solid #ffffff18;padding-bottom:18px}
@@ -90,7 +88,6 @@ nav a[aria-current=page]{color:var(--orange)}
 .word-tip strong{font-weight:700}.word-tip [lang=ar]{color:#a8461a}
 
 /* Responsive pass: readable small labels, real touch targets and phone-friendly layout. */
-.logo{letter-spacing:-.23em;padding-right:.18em}.logo span{font-size:.73em;left:.34em;top:.07em}
 .archive-name{flex:1}
 .archive-heading>span{white-space:nowrap}
 .section-top>span,.work .section-top .eyebrow,.case-kicker,.backend-note>span,.archive-heading .eyebrow,.profile-facts small{font-size:10px}
@@ -103,12 +100,11 @@ footer>div{font-size:11px}
 footer{padding-bottom:70px}
 @media(max-aspect-ratio:9/10){.scroll-journey .annotation{top:auto;bottom:34px;left:5%;right:auto}}
 @media(pointer:coarse){
- nav a,.case-links a,.source-links a,.archive-body a,.profile-links a,footer>div a,.hero .text-link{position:relative}
- nav a::after,.case-links a::after,.source-links a::after,.archive-body a::after,.profile-links a::after,footer>div a::after,.hero .text-link::after{content:'';position:absolute;inset:-12px -8px}
+ .case-links a,.source-links a,.archive-body a,.profile-links a,footer>div a,.hero .text-link{position:relative}
+ .case-links a::after,.source-links a::after,.archive-body a::after,.profile-links a::after,footer>div a::after,.hero .text-link::after{content:'';position:absolute;inset:-12px -8px}
  .project-filters button{min-height:42px}
 }
 @media(max-width:600px){
- nav{gap:20px}nav a{font-size:13px}
  .hero .eyebrow{font-size:10px}
  .annotation .fine{font-size:9px}
  .case-kicker{font-size:10px}
@@ -118,7 +114,6 @@ footer{padding-bottom:70px}
 @media(max-aspect-ratio:9/10) and (max-height:719px){.scroll-journey .annotation{display:none}}
 /* Phones held sideways: a short hero that still fits headline, intro and buttons. */
 @media(orientation:landscape) and (max-height:520px){
- header{height:64px}.logo{font-size:32px}
  .scroll-journey .hero-copy{padding-top:82px;width:54%}
  .scroll-journey h1{font-size:min(11vw,19vh)}
  .hero .eyebrow{margin-bottom:10px}
@@ -138,7 +133,6 @@ footer{padding-bottom:70px}
 .lang-menu a{display:block;padding:11px 12px;border-radius:6px;font-size:14px;color:#d9d2c5}
 .lang-menu a:hover,.lang-menu a:focus-visible{background:#2a2925;color:#fff}
 .lang-menu a[aria-current=true]{color:var(--orange)}
-@media(max-width:600px){.brand-name{display:none}.lang-menu summary{min-height:36px;padding:0 10px}}
 
 /* Arabic typography: Alexandria for display type, IBM Plex Sans Arabic for text.
    Arabic letters connect, so letter-spacing always stays at 0. */
@@ -157,7 +151,6 @@ html[lang=ar] .word.is-term{text-underline-offset:.28em}
 @media(max-width:600px){html[lang=ar] h1{font-size:15vw}html[lang=ar] .work .work-heading h2{font-size:13vw}html[lang=ar] footer>a{font-size:15vw}}
 
 /* Right-to-left layout: mirror the physical offsets the base styles use. */
-[dir=rtl] .logo{direction:ltr}
 [dir=rtl] .scroll-journey .hero-copy,[dir=rtl] .hero-copy{padding-left:0;padding-right:4%}
 [dir=rtl] .annotation{right:auto;left:5%}
 [dir=rtl] .status-light{margin-right:0;margin-left:8px}
@@ -179,5 +172,53 @@ html[lang=ar] .word.is-term{text-underline-offset:.28em}
 html[lang=ar] :is(.eyebrow,.case-kicker,.profile-facts small,.section-top>span,.archive-heading .eyebrow,.backend-note>span,.project-kind,.filter-count,.case-visual figcaption,.annotation){font-size:12px}
 html[lang=ar] :is(.annotation .fine,.skills,footer>div,.amposter-phones small){font-size:12px}
 html[lang=ar] .about .profile-facts p,html[lang=ar] .archive-body p,html[lang=ar] .backend-note>p,html[lang=ar] .feature-list{font-size:13px}
-html[lang=ar] .brand{font-size:12px}
 [dir=rtl] footer>div>[dir=ltr]{text-align:right}
+
+/* Icons: one Lucide sprite, stroked in the current text colour. */
+.sprite{position:absolute;width:0;height:0;overflow:hidden}
+.icon{width:1.15em;height:1.15em;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* Hero identity: the name leads, the role sits under it. */
+.scroll-journey .hero-copy{padding-top:clamp(96px,15vh,190px)}
+.hero-name{display:grid;gap:6px;margin-bottom:clamp(22px,3.4vh,40px)}
+.hero-name-text{margin:0;font-size:clamp(21px,1.75vw,27px);font-weight:600;letter-spacing:-.015em;color:var(--bone)}
+.hero-role{margin:0;display:flex;align-items:center;gap:10px;font-size:15px;color:#a8a194}
+.hero-role::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--orange);box-shadow:0 0 0 4px #ff641b22}
+
+/* Tabs above the laptop switch what its screen shows. */
+.laptop-panel{position:absolute;z-index:3;top:clamp(92px,13vh,150px);inset-inline-end:5%;display:grid;justify-items:end;gap:10px}
+.laptop-tabs{display:flex;gap:4px;padding:5px;border-radius:14px;background:#1b1a17d9;border:1px solid #ffffff14;box-shadow:0 10px 30px #0006;backdrop-filter:blur(10px)}
+.laptop-tab{display:flex;align-items:center;gap:8px;min-height:40px;padding:0 15px;border:0;border-radius:10px;background:transparent;color:#a9a295;font:500 14px 'DM Sans',Arial,sans-serif;cursor:pointer;transition:background .2s,color .2s}
+.laptop-tab:hover{color:var(--bone);background:#ffffff0b}
+.laptop-tab:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+.laptop-tab[aria-pressed=true]{color:var(--bone);background:#2c2924;box-shadow:inset 0 1px 0 #ffffff14,0 2px 10px #0005}
+.laptop-tab[aria-pressed=true] .icon{color:var(--orange)}
+.laptop-hint{margin:0;display:flex;align-items:center;gap:8px;font-size:13px;color:#8d867a}
+@media(max-aspect-ratio:9/10){.laptop-panel{top:var(--panel-top,62%);inset-inline:0;justify-items:center}}
+@media(max-width:600px){.laptop-tab{padding:0 12px;font-size:13px}.laptop-hint{display:none}}
+@media(pointer:coarse){.laptop-hint{display:none}}
+
+/* Floating dock: site navigation, the CV and the language menu in one place. */
+.dock{position:fixed;z-index:30;bottom:max(16px,env(safe-area-inset-bottom));left:50%;translate:-50% 0;display:flex;align-items:center;gap:2px;padding:6px;border-radius:18px;background:#161512cc;border:1px solid #ffffff17;box-shadow:0 14px 36px #0008,inset 0 1px 0 #ffffff0d;backdrop-filter:blur(16px) saturate(1.2)}
+.dock-item{display:flex;align-items:center;gap:8px;min-height:42px;padding:0 14px;border-radius:12px;color:#b4ac9e;font-size:14px;font-weight:500;transition:background .2s,color .2s}
+.dock-item:hover{color:var(--bone);background:#ffffff0d}
+.dock-item[aria-current=true]{color:var(--bone);background:#ffffff14}
+.dock-item[aria-current=true] .icon{color:var(--orange)}
+.dock-sep{width:1px;height:22px;margin:0 4px;background:#ffffff1c}
+.dock .lang-menu summary{min-height:42px;border:0;border-radius:12px;padding:0 13px;color:#b4ac9e}
+.dock .lang-menu summary:hover,.dock .lang-menu[open] summary{background:#ffffff0d;color:var(--bone)}
+.dock .lang-menu ul{top:auto;bottom:calc(100% + 12px)}
+.dock .lang-menu svg{width:1.15em;height:1.15em;stroke-width:1.8}
+@media(max-width:600px){
+ .dock{left:10px;right:10px;translate:none;justify-content:space-between;padding:5px;border-radius:16px}
+ .dock-item{flex-direction:column;justify-content:center;gap:3px;min-height:52px;min-width:0;flex:1;padding:0 4px;font-size:11px}
+ .dock-sep{display:none}
+ .dock .lang-menu summary{flex-direction:column;justify-content:center;gap:3px;min-height:52px;padding:0 8px;font-size:11px}
+}
+footer.contact{padding-bottom:130px}
+
+/* Copy the email address in one click. */
+.copy-email{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:0 13px;border:1px solid #ffffff24;border-radius:999px;background:transparent;color:inherit;font:inherit;cursor:pointer;transition:border-color .2s,color .2s,background .2s}
+.copy-email:hover{border-color:#ff641b80;color:var(--bone)}
+.copy-email.copied{border-color:#5fc98a80;color:#9fe3b8;background:#5fc98a14}
+@media(max-width:600px){.scroll-journey .hero-copy{padding-top:56px}.hero-name{margin-bottom:18px}}

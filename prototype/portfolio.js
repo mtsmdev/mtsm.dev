@@ -61,7 +61,7 @@ function whenIntroDone(run){
 function setLaptopMode(mode,rebuild=false){
  if(!modeLinks[mode])return;const copy=copyFor(mode);
  document.body.dataset.laptopMode=mode;
- document.querySelectorAll('[data-laptop-mode]').forEach(link=>{if(link.dataset.laptopMode===mode)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');});
+ document.querySelectorAll('[data-laptop-mode]').forEach(tab=>tab.setAttribute('aria-pressed',String(tab.dataset.laptopMode===mode)));
  for(const link of [laptopAction,primaryAction]){link.setAttribute('href',copy.href);link.setAttribute('aria-label',copy.label);if(mode==='cv'){link.target='_blank';link.rel='noopener';}else{link.removeAttribute('target');link.removeAttribute('rel');}}
  laptopAction.textContent=copy.label;
  primaryAction.textContent=copy.button;
@@ -113,12 +113,12 @@ function enterProjects(){
 }
 document.querySelectorAll('a[href="#work"]').forEach(link=>{if(link===laptopAction||link===primaryAction)return;link.addEventListener('click',event=>{event.preventDefault();enterProjects();});});
 for(const link of [laptopAction,primaryAction])link.addEventListener('click',event=>{if((document.body.dataset.laptopMode||'work')==='work'){event.preventDefault();enterProjects();}});
-document.querySelectorAll('[data-laptop-mode]').forEach(link=>link.addEventListener('click',event=>{
- event.preventDefault();stopJourney();setLaptopMode(link.dataset.laptopMode);
- window.scrollTo({top:0,behavior:'instant'});
- history.replaceState(null,'',link.getAttribute('href'));
+// The tabs above the laptop switch what its screen shows; #cv deep-links to the CV view.
+document.querySelectorAll('[data-laptop-mode]').forEach(tab=>tab.addEventListener('click',()=>{
+ stopJourney();setLaptopMode(tab.dataset.laptopMode);
+ const url=new URL(location.href);url.hash=tab.dataset.laptopMode==='cv'?'cv':'';history.replaceState(null,'',url);
 }));
-setLaptopMode(location.hash==='#cv'?'cv':location.hash==='#contact'?'contact':'work');
+setLaptopMode(location.hash==='#cv'?'cv':'work');
 filters.forEach(button=>button.addEventListener('click',()=>{
  filters.forEach(b=>{b.classList.toggle('active',b===button);b.setAttribute('aria-pressed',String(b===button));});
  let count=0;
@@ -134,3 +134,29 @@ window.addEventListener('i18nchange',()=>{
  updateCount([...projects].filter(p=>!p.hidden).length);
 });
 
+
+// Dock: highlight the section in view. The projects section is pinned during the laptop journey,
+// so it counts as active only once the journey has (nearly) finished.
+const dockItems=[...document.querySelectorAll('.dock-item[data-section]')];
+const journeyEl=document.querySelector('.scroll-journey'),aboutEl=document.getElementById('about'),contactEl=document.getElementById('contact');
+let spyQueued=false;
+function spy(){
+ spyQueued=false;
+ const probe=scrollY+innerHeight*.45,journeyEnd=journeyEl.offsetTop+journeyEl.offsetHeight-innerHeight;
+ const active=probe>=contactEl.offsetTop||innerHeight+scrollY>=document.documentElement.scrollHeight-4?'contact':probe>=aboutEl.offsetTop?'about':scrollY>=journeyEnd-innerHeight*.25?'work':'top';
+ for(const item of dockItems){if(item.dataset.section===active)item.setAttribute('aria-current','true');else item.removeAttribute('aria-current');}
+}
+addEventListener('scroll',()=>{if(!spyQueued){spyQueued=true;requestAnimationFrame(spy);}},{passive:true});
+addEventListener('resize',spy,{passive:true});spy();
+// Dock 'Start' returns to the top of the hero.
+document.querySelector('.dock-item[data-section=top]')?.addEventListener('click',event=>{event.preventDefault();stopJourney();scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});history.replaceState(null,'',location.pathname+location.search);});
+// Copy the email address with a short confirmation, announced to screen readers too.
+for(const button of document.querySelectorAll('.copy-email')){
+ button.querySelector('span').setAttribute('aria-live','polite');
+ button.addEventListener('click',async()=>{
+  const label=button.querySelector('span'),use=button.querySelector('use');
+  try{await navigator.clipboard.writeText(button.dataset.email);}catch{location.href='mailto:'+button.dataset.email;return;}
+  label.textContent=i18n.text().copied;use.setAttribute('href','#i-check');button.classList.add('copied');
+  clearTimeout(button._reset);button._reset=setTimeout(()=>{label.textContent=i18n.t('contact.copy');use.setAttribute('href','#i-copy');button.classList.remove('copied');},2200);
+ });
+}

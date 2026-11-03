@@ -11,7 +11,7 @@ document.body.classList.toggle('reduced',reduced);
 const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:.1});document.querySelectorAll('.reveal').forEach(e=>observer.observe(e));
 // Tilt follows a mouse or pen; touch scrolling must not shake the laptop.
 window.addEventListener('pointermove',e=>{if(e.pointerType==='touch')return;px=e.clientX/innerWidth-.5;py=e.clientY/innerHeight-.5;},{passive:true});
-const heroCopy=document.querySelector('.hero-copy'),annotation=document.querySelector('.annotation'),workReveals=[...work.querySelectorAll('.reveal')];
+const heroCopy=document.querySelector('.hero-copy'),annotation=document.querySelector('.laptop-panel'),workReveals=[...work.querySelectorAll('.reveal')];
 let journeyTop=0,journeyEnd=1,lastPageProgress=-1,projectsRevealed=false;
 function measureJourney(){journeyTop=journey.getBoundingClientRect().top+window.scrollY;journeyEnd=Math.max(1,journey.offsetHeight-innerHeight);lastPageProgress=-1;}
 measureJourney();window.addEventListener('resize',measureJourney,{passive:true});
@@ -161,6 +161,8 @@ function resize(){
  renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();mobile=innerWidth<650;
  // On portrait screens the laptop sits in the free space below the hero buttons.
  portrait=camera.aspect<.9;freeTop=heroActions?heroCopy.offsetTop+heroActions.offsetTop+heroActions.offsetHeight:0;
+ // Portrait: the laptop tabs sit between the buttons and the laptop.
+ if(portrait&&annotation){host.parentElement.style.setProperty('--panel-top',(freeTop+18)+'px');freeTop+=annotation.offsetHeight+18;}
  if(portrait)fitPortrait(w,h);
  renderDirty=true;
 }
@@ -178,7 +180,7 @@ measureLaptop();
 function fitPortrait(w,h){
  const distance=mobile?10.5:10.8,perPx=2*Math.tan(THREE.MathUtils.degToRad(17.5))*distance/h;
  fitCam.aspect=w/h;fitCam.updateProjectionMatrix();fitCam.position.set(0,.65,distance);fitCam.lookAt(0,-.01,-.25);fitCam.updateMatrixWorld();
- const bottom=h-(h<720?16:90),top=Math.min(freeTop+16,bottom-80);// short screens hide the annotation
+ const bottom=h-96,top=Math.min(freeTop+12,bottom-80);// leave room for the dock
  const bounds=()=>{
   let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
   for(let i=0;i<8;i++){

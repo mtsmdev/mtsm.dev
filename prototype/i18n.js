@@ -8,12 +8,13 @@ const strings={
   'meta.title':'Moatasem Al-Refaai — Software developer',
   'meta.description':'Portfolio of Moatasem Al-Refaai, software developer. Web apps, Android apps and UI/UX, from frontend to API.',
   'lang.label':'Choose language',
-  'brand.label':'Moatasem Al-Refaai, back to top',
-  'nav.label':'Main navigation','nav.work':'Projects','nav.cv':'My CV','nav.contact':'Contact',
+  'hero.name':'Moatasem Al-Refaai','hero.role':'Software developer · UI/UX',
+  'tabs.label':'What the laptop shows','tabs.work':'Projects','tabs.cv':'My CV','tabs.contact':'Contact','tabs.hint':'Drag to spin',
+  'dock.label':'Jump to','dock.home':'Home','dock.work':'Work','dock.about':'About','dock.contact':'Contact','dock.cv':'CV',
+  'contact.copy':'Copy email address',
   'hero.label':'Introduction',
   'hero.ihsan':'<strong>Ihsan</strong> <span lang="ar">(إحسان)</span> is Arabic for doing something as well as you possibly can, with care and attention, even when no one is watching. That’s how I like to build.',
   'hero.intro':'Hi, I’m Moatasem. I build web apps that work well and feel good to use, from frontend to API.',
-  'hero.annotation':'<span class="status-light"></span>MY WORKSPACE / XPS 15 9500<div class="fine">VS CODE · TYPESCRIPT · LOTS OF COFFEE</div>',
   'loader.label':'Loading workspace',
   'laptop.label':'My Dell XPS 15 9500. The lid opens by itself. Scroll to bring the laptop to the centre and see my projects through its screen.',
   'work.eyebrow':'PROJECTS','work.platforms':'WEB · MOBILE · DESKTOP',
@@ -69,13 +70,13 @@ const strings={
   'meta.title':'معتصم الرفاعي — مطوّر برمجيات',
   'meta.description':'معرض أعمال معتصم الرفاعي، مطوّر برمجيات. تطبيقات ويب وأندرويد وتصميم واجهات وتجربة مستخدم، من الواجهة الأمامية حتى الـ API.',
   'lang.label':'اختر اللغة',
-  'brand.label':'معتصم الرفاعي، العودة إلى الأعلى','brand.name':'معتصم<br>الرفاعي',
-  'nav.label':'التنقل الرئيسي','nav.work':'المشاريع','nav.cv':'سيرتي الذاتية','nav.contact':'تواصل',
+  'hero.name':'معتصم الرفاعي','hero.role':'مطوّر برمجيات · UI/UX',
+  'tabs.label':'ما يعرضه الحاسوب','tabs.work':'المشاريع','tabs.cv':'سيرتي الذاتية','tabs.contact':'تواصل','tabs.hint':'اسحب للتدوير',
+  'dock.label':'انتقل إلى','dock.home':'الرئيسية','dock.work':'الأعمال','dock.about':'عنّي','dock.contact':'تواصل','dock.cv':'السيرة',
+  'contact.copy':'انسخ البريد الإلكتروني',
   'hero.label':'مقدمة',
-  'hero.eyebrow':'مطوّر برمجيات <span>×</span> UI / UX',
   'hero.ihsan':'<strong>الإحسان</strong> أن تؤدي عملك على أحسن وجه، بإتقان وعناية، حتى حين لا يراك أحد. وهكذا أحب أن أبني.',
   'hero.intro':'أهلًا، أنا معتصم. أبني تطبيقات ويب تعمل بكفاءة ويسهل استخدامها، من الواجهة الأمامية حتى الـ API.',
-  'hero.annotation':'<span class="status-light"></span>مساحة عملي / <bdi>XPS 15 9500</bdi><div class="fine"><bdi>VS CODE</bdi> · <bdi>TYPESCRIPT</bdi> · قهوة كثيرة</div>',
   'loader.label':'جارٍ تحميل مساحة العمل',
   'laptop.label':'حاسوبي Dell XPS 15 9500. يُفتح الغطاء تلقائيًا. مرّر الصفحة لينتقل الحاسوب إلى المنتصف وتستعرض مشاريعي عبر شاشته.',
   'work.eyebrow':'المشاريع','work.platforms':'ويب · موبايل · سطح المكتب',
@@ -137,6 +138,7 @@ const scriptStrings={
    contact:{button:'Mail mij',headline:['LATEN WE','PRATEN'],label:'Stuur een e-mail naar career@mtsm.dev'}
   },
   words:['KOFFIE','THEE','CHOCOMELK','IHSAN'],
+  copied:'Gekopieerd',
   projects:{one:'# project',other:'# projecten'}
  },
  en:{
@@ -146,6 +148,7 @@ const scriptStrings={
    contact:{button:'Email me',headline:['LET’S','TALK'],label:'Send an email to career@mtsm.dev'}
   },
   words:['COFFEE','TEA','COCOA','IHSAN'],
+  copied:'Copied',
   projects:{one:'# project',other:'# projects'}
  },
  ar:{
@@ -155,6 +158,7 @@ const scriptStrings={
    contact:{button:'راسلني',headline:['لنتحدث','معًا'],label:'أرسل بريدًا إلى career@mtsm.dev'}
   },
   words:['بالقهوة','بالشاي','بالكاكاو','بإحسان'],
+  copied:'تم النسخ',
   projects:{zero:'لا مشاريع',one:'مشروع واحد',two:'مشروعان',few:'# مشاريع',many:'# مشروعًا',other:'# مشروع'}
  }
 };
