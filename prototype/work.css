@@ -55,7 +55,9 @@ h1{font-size:clamp(60px,8.4vw,148px)}
 .work .project-filters button.active{background:var(--bone);border-color:var(--bone);color:#16130f}
 .timeline{--label-fs:clamp(44px,4.4vw,68px);--label-mid:calc(var(--label-fs)*.45);--sticky-top:clamp(24px,6vh,64px);--year-col:132px;--gap:72px;--spine:calc(var(--year-col) + var(--gap)/2);position:relative;list-style:none;margin:0;padding:0}
 .timeline::before,.timeline::after{content:'';position:absolute;z-index:0;top:var(--spine-top,37px);bottom:var(--spine-bottom,0px);inset-inline-start:calc(var(--spine) - 1px);width:2px;border-radius:2px;pointer-events:none}
-.timeline::before{background:var(--line-2);transform-origin:top;scale:1 var(--line-reveal,1)}
+.timeline::before{background:var(--line-2)}
+/* The spine draws down from the first dot after the morph (morph.js sets --line-reveal). */
+.timeline::before,.timeline::after{clip-path:inset(0 0 calc((1 - var(--line-reveal,1)) * 100%) 0)}
 .timeline::after{background:linear-gradient(var(--orange),#ff641b88);transform-origin:top;scale:1 0}
 @supports ((animation-timeline:view()) and (animation-range:0% 100%)){
  .timeline::after{animation:spine-fill linear both;animation-timeline:view();animation-range:cover 0% cover 85%}
@@ -235,6 +237,7 @@ html[lang=ar] .contact h2{font-size:clamp(44px,6.4vw,104px);line-height:1.2}
 .morph-dot{border-radius:50%;background:var(--orange);box-shadow:0 0 0 6px #ff641b22}
 .morph-year{transform-origin:0 0;color:var(--bone);white-space:nowrap;font-variant-numeric:tabular-nums}
 .work-ruler li{transition:none}
+.work-ruler{will-change:scale}
 /* Filter chips: rise, turn and fade in one by one. */
 .project-filters.chips-ready button{opacity:0;translate:0 22px;rotate:-5deg;transition:opacity .6s var(--ease-out),translate .8s var(--ease-out),rotate .8s var(--ease-out),background .25s,color .25s,border-color .25s;transition-delay:calc(var(--i,0)*90ms),calc(var(--i,0)*90ms),calc(var(--i,0)*90ms),0s,0s,0s}
 [dir=rtl] .project-filters.chips-ready button{rotate:5deg}
