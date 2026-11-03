@@ -25,10 +25,13 @@ function updatePage(p){
  if(p>.84&&!projectsRevealed){projectsRevealed=true;workReveals.forEach(e=>e.classList.add('visible'));}
 }
 const nextFrame=()=>new Promise(resolve=>requestAnimationFrame(resolve));
+// Loader progress: downloads fill the first 90%, warm-up (fonts, shaders, uploads) the rest.
+const loaderBox=host.querySelector('.scene-loader'),loaderPct=host.querySelector('.scene-loader-pct');
+const showLoad=v=>{if(!loaderBox)return;loaderBox.style.setProperty('--load',v.toFixed(3));loaderPct.textContent=Math.round(v*100)+'%';};
 try{
 const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:'high-performance'});renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
 const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(35,1,.03,100),pmrem=new THREE.PMREMGenerator(renderer),room=new RoomEnvironment();scene.environment=pmrem.fromScene(room,.04).texture;room.dispose();pmrem.dispose();
-const {laptop,lid,display}=await createXPS();scene.add(laptop);
+const {laptop,lid,display}=await createXPS((done,total)=>showLoad(done/total*.9));scene.add(laptop);
 const key=new THREE.DirectionalLight(0xffefdc,2);key.position.set(-3,5,6);scene.add(key);const rim=new THREE.DirectionalLight(0xffffff,2);rim.position.set(3,2,-3);scene.add(rim);const glow=new THREE.PointLight(0xff641b,12,12);glow.position.set(2,-1,3);scene.add(glow);
 const maxAnisotropy=renderer.capabilities.getMaxAnisotropy();
 
@@ -210,7 +213,7 @@ await Promise.race([Promise.all([document.fonts.ready,...arabicFonts,loaded(proj
 screenArt();paintFullScreen(document.body.dataset.laptopMode||'work',0);
 scene.traverse(object=>{const m=object.material;if(m)for(const slot of ['map','aoMap','alphaMap'])if(m[slot])renderer.initTexture(m[slot]);});
 renderer.initTexture(screenTexture);renderer.initTexture(projectTexture);
-await renderer.compileAsync(scene,camera);
+await renderer.compileAsync(scene,camera);showLoad(1);
 start=modeStarted=performance.now();pose(start,progress());
 // Keep rendering the first pose until the GPU has drained the uploads (two quick frames in a row).
 for(let i=0,quick=0,last=await nextFrame();i<30&&quick<2;i++){renderer.render(scene,camera);const now=await nextFrame();quick=now-last<25?quick+1:0;last=now;}

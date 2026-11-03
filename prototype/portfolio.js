@@ -52,10 +52,11 @@ function buildRotatingWord(content,headlineWords){
  const caret=document.createElement('span');caret.className='caret';caret.setAttribute('aria-hidden','true');
  wrap.append(word,caret);content.append(wrap);return word;
 }
+// The headline is visible from the first paint, so the word starts cycling once its entrance has played.
+let introPlayed=false;
 function whenIntroDone(run){
- if(!document.body.classList.contains('booting'))return run(900);
- const watch=new MutationObserver(()=>{if(!document.body.classList.contains('booting')){watch.disconnect();run(2600);}});
- watch.observe(document.body,{attributes:true,attributeFilter:['class']});
+ if(introPlayed)return run(900);
+ introPlayed=true;run(2400);
 }
 function setLaptopMode(mode,rebuild=false){
  if(!modeLinks[mode])return;const copy=copyFor(mode);

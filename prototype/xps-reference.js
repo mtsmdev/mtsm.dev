@@ -2,13 +2,15 @@ import * as THREE from 'three';
 
 // Detailed geometry and UV atlases from the HMX XPS 15 9500 viewer supplied by the user.
 // Preserve the source attribution in assets/xps/manifest.json when packaging this prototype.
-export async function createXPS(){
+export async function createXPS(onProgress=()=>{}){
  const base='./assets/xps/',manifest=await (await fetch(base+'manifest.json')).json();
  const scale=4.7/34.44;
  const hingeY=-3.16224*scale-1.08,hingeZ=-9.06133*scale+1;
  const laptop=new THREE.Group(),lid=new THREE.Group();laptop.name='Dell XPS 15 9500 — HMX reference geometry';lid.position.set(0,hingeY,hingeZ);laptop.add(lid);
  const cache=new Map(),loader=new THREE.TextureLoader(),textureJobs=[];
- function tex(name,colour=true){const file=manifest.textures[name];if(!file)return null;const key=file+colour;if(cache.has(key))return cache.get(key);let resolve,reject;textureJobs.push(new Promise((yes,no)=>{resolve=yes;reject=no;}));const t=loader.load(base+file,resolve,undefined,reject);t.colorSpace=colour?THREE.SRGBColorSpace:THREE.NoColorSpace;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=8;cache.set(key,t);return t;}
+ // Progress counts every mesh and texture download, so a loader can show real progress.
+ let done=0,total=0;const tick=()=>{done++;if(total)onProgress(done,total);};
+ function tex(name,colour=true){const file=manifest.textures[name];if(!file)return null;const key=file+colour;if(cache.has(key))return cache.get(key);let resolve,reject;textureJobs.push(new Promise((yes,no)=>{resolve=yes;reject=no;}).then(tick));const t=loader.load(base+file,resolve,undefined,reject);t.colorSpace=colour?THREE.SRGBColorSpace:THREE.NoColorSpace;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=8;cache.set(key,t);return t;}
  const silverIds=new Set([23,24,25,26,28,29,31,32,62,65,71,75,77,83]);
  const mats=manifest.materials.map((m,i)=>{
   const silver=silverIds.has(i),c=(m.diffusecolour||'0.02,0.02,0.02').split(',').map(Number);
@@ -27,7 +29,9 @@ export async function createXPS(){
   return material;
  });
  let display;
- await Promise.all(manifest.meshes.filter(m=>!m.name.startsWith('Hotspot')&&m.material!==27).map(async m=>{
+ const meshes=manifest.meshes.filter(m=>!m.name.startsWith('Hotspot')&&m.material!==27);
+ total=meshes.length+textureJobs.length;onProgress(done,total);
+ await Promise.all(meshes.map(async m=>{
   const response=await fetch(base+m.file);if(!response.ok)throw Error('XPS mesh unavailable: '+m.name);const data=await response.arrayBuffer(),dv=new DataView(data);
   const n=dv.getUint32(0,true),nn=dv.getUint32(4,true),nu=dv.getUint32(8,true),ni=dv.getUint32(12,true);let at=16;
   const raw=new Uint16Array(data,at,n);at+=n*2;const normals=new Int16Array(data,at,nn);at+=nn*2;const uvs=new Uint16Array(data,at,nu);at+=nu*2;
@@ -39,7 +43,7 @@ export async function createXPS(){
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(positions,3));g.setAttribute('normal',new THREE.BufferAttribute(normal,3));g.setAttribute('uv',new THREE.BufferAttribute(uv,2));g.setAttribute('uv1',new THREE.BufferAttribute(uv.slice(),2));g.setIndex(new THREE.BufferAttribute(indices,1));g.computeBoundingSphere();
   // The display has its own UV atlas region; normalize this surface to fill it with the portfolio.
   if(m.material===50){for(let i=0;i<nu;i++){const a=i%2;uv[i]=(uv[i]-m.uvbox[a])/(m.uvbox[a+2]-m.uvbox[a]);}g.attributes.uv.needsUpdate=true;}
-  const mesh=new THREE.Mesh(g,mats[m.material]);mesh.name=m.name;(m.screen?lid:laptop).add(mesh);if(m.material===50)display=mesh;
+  const mesh=new THREE.Mesh(g,mats[m.material]);mesh.name=m.name;(m.screen?lid:laptop).add(mesh);if(m.material===50)display=mesh;tick();
  }));
  if(!display)throw Error('XPS display mesh missing');
  await Promise.all(textureJobs);
