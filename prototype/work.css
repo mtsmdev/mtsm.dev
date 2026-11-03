@@ -37,7 +37,8 @@ h1{font-size:clamp(60px,8.4vw,148px)}
 .work-sub{margin:0;font-size:clamp(15px,2.1cqw,32px);line-height:1.35;color:#c4bcae;max-width:30ch}
 .work-ruler{list-style:none;margin:2cqw 0 0;padding:0;display:flex;justify-content:space-between;border-top:1px solid var(--line-2);font-size:clamp(11px,1.15cqw,17px);font-variant-numeric:tabular-nums;color:var(--muted-2)}
 .work-ruler li{position:relative;padding-top:1.4cqw;color:var(--bone)}
-.ruler-dot{position:absolute;top:-.45cqw;inset-inline-start:0;width:.9cqw;height:.9cqw;min-width:6px;min-height:6px;border-radius:50%;background:var(--orange);box-shadow:0 0 0 .4cqw #ff641b2e;translate:0 -25%}
+/* Dots are centred on the 1px ruler line: the li starts right under the border, so the line's centre is at -0.5px. */
+.ruler-dot{position:absolute;top:-.5px;inset-inline-start:0;width:.9cqw;height:.9cqw;min-width:6px;min-height:6px;border-radius:50%;background:var(--orange);box-shadow:0 0 0 .4cqw #ff641b2e;translate:0 -50%}
 .ruler-year{display:inline-block}
 .work-ruler .ruler-now{color:var(--orange)}
 .work-ruler .ruler-now .ruler-dot{background:transparent;border:1px solid var(--orange);box-shadow:none}
