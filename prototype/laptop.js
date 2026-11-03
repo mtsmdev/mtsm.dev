@@ -11,7 +11,7 @@ const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isInte
 // Tilt follows a mouse or pen; touch scrolling must not shake the laptop.
 window.addEventListener('pointermove',e=>{if(e.pointerType==='touch')return;px=e.clientX/innerWidth-.5;py=e.clientY/innerHeight-.5;},{passive:true});
 const heroCopy=document.querySelector('.hero-copy'),workReveals=[...work.querySelectorAll('.reveal')];
-const panel=work.querySelector('.work-screen'),hero=journey.querySelector('.hero'),orbit=journey.querySelector('.skill-orbit');
+const panel=work.querySelector('.work-screen'),hero=journey.querySelector('.hero'),orbits=[...journey.querySelectorAll('.skill-orbit')],orbit=orbits[0];
 let journeyTop=0,journeyEnd=1,lastPageProgress=-1,projectsRevealed=false;
 function measureJourney(){journeyTop=journey.getBoundingClientRect().top+window.scrollY;journeyEnd=Math.max(1,journey.offsetHeight-innerHeight);lastPageProgress=-1;}
 measureJourney();window.addEventListener('resize',measureJourney,{passive:true});
@@ -20,7 +20,6 @@ function progress(){return clamp((window.scrollY-journeyTop)/journeyEnd);}
 function updatePage(p){
  if(p===lastPageProgress)return;lastPageProgress=p;
  // Skill chips drift apart and fade as the laptop turns toward the screen.
- if(orbit)orbit.style.setProperty('--spread',smooth(0,.24,p).toFixed(3));
  heroCopy.style.opacity=1-smooth(.03,.27,p);heroCopy.style.transform=`translateY(${-smooth(0,.3,p)*50}px)`;heroCopy.style.visibility=p>.3?'hidden':'visible';
  if(reduced){work.style.opacity=1;work.style.transform='';work.style.pointerEvents='auto';}
  else{
@@ -252,7 +251,7 @@ let landScale=1,landX=0,landY=0;
 function fitLandscape(w,h){
  const distance=mobile?10.5:10.8,tangent=Math.tan(THREE.MathUtils.degToRad(17.5)),perPx=2*tangent*distance/h,viewWidth=perPx*w;
  fitCam.aspect=w/h;fitCam.updateProjectionMatrix();fitCam.position.set(0,.65,distance);fitCam.lookAt(0,-.01,-.25);fitCam.updateMatrixWorld();
- landScale=Math.min(h<520?.78:1.04,viewWidth*.39/4.7);landX=viewWidth*.25*side;landY=0;
+ landScale=Math.min(h<520?.78:.95,viewWidth*.39/4.7);landX=viewWidth*.25*side;landY=0;
  const bounds=()=>{
   let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
   for(const point of hull){
@@ -271,7 +270,8 @@ function fitLandscape(w,h){
  const lo=side>0?near:far,hi=side>0?w-far:w-near;
  for(let pass=0;pass<5;pass++){
   const b=bounds(),width=b.maxX-b.minX;
-  if(width>hi-lo){landScale*=(hi-lo)/width;landX*=(hi-lo)/width;landY*=(hi-lo)/width;continue;}
+  const room=(hi-lo)*.82;// leave some air; the laptop grows from here once you scroll
+  if(width>room){landScale*=room/width;landX*=room/width;landY*=room/width;continue;}
   landY+=((b.minY+b.maxY)/2-h/2)*perPx;
   landX+=((lo+hi)/2-(b.minX+b.maxX)/2)*perPx;
  }
@@ -279,28 +279,39 @@ function fitLandscape(w,h){
 // Skill chips are anchored to points around the laptop screen, in the screen's own frame: u runs along
 // the top edge (0 = left corner, 1 = right), v down the side (0 = top, 1 = hinge). Projected every frame,
 // so they follow the laptop's tilt. Mirrored for RTL; each drifts straight away from the laptop on scroll.
-const chipAnchors=[[.1,-.26],[.56,-.34],[1.0,-.22],[1.13,.42]];// above the screen, and beside its outer edge
 const anchorPoint=new THREE.Vector3(),cornerW=[0,1,2,3].map(()=>new THREE.Vector3());
 let chipsShown=true;
 // Chip widths only change on resize; reading them per frame would force a layout after every write.
-let chipHalf=[];const measureChips=()=>{if(orbit)chipHalf=[...orbit.children].map(c=>c.offsetWidth/2);};
-function placeChips(p){
- if(!orbit)return;
+const chips=orbits.flatMap(o=>[...o.children]);
+let chipHalf=[];const measureChips=()=>{chipHalf=chips.map(c=>c.offsetWidth/2);};
+// Chips sit right around the screen (data-u/data-v in the screen's frame; the back layer is partly hidden
+// behind the lid). Once the lid has opened they pop out of the screen one by one; on scroll they are pushed
+// outward with the growing laptop and fade.
+const popEase=t=>1+2.2*Math.pow(t-1,3)+1.2*Math.pow(t-1,2);// ease-out with a slight overshoot
+function placeChips(p,now){
+ if(!chips.length)return;
  const show=!portrait&&p<.3;
- if(!show){if(chipsShown){orbit.style.visibility='hidden';chipsShown=false;}return;}
- if(!chipsShown){orbit.style.visibility='';chipsShown=true;}
+ if(!show){if(chipsShown){orbits.forEach(o=>o.style.visibility='hidden');chipsShown=false;}return;}
+ if(!chipsShown){orbits.forEach(o=>o.style.visibility='');chipsShown=true;}
  laptop.updateMatrixWorld(true);camera.updateMatrixWorld();
  screenCorners.forEach((c,i)=>cornerW[i].copy(c).applyMatrix4(display.matrixWorld));
- const [tl,tr,,bl]=cornerW,w=host.clientWidth,h=host.clientHeight,spread=smooth(0,.24,p);
+ const [tl,tr,,bl]=cornerW,w=host.clientWidth,h=host.clientHeight,spread=smooth(.02,.24,p);
  const centre=anchorPoint.copy(tl).lerp(cornerW[2],.5).project(camera),cx=(centre.x+1)/2*w,cy=(1-centre.y)/2*h;
- [...orbit.children].forEach((chip,i)=>{
-  const [u0,v]=chipAnchors[i%chipAnchors.length],u=side>0?u0:1-u0;
-  anchorPoint.copy(tl).addScaledVector(cornerW[1].clone().sub(tl),u).addScaledVector(bl.clone().sub(tl),v).project(camera);
-  // Keep every chip on screen and clear of the dock.
-  const half=chipHalf[i]||60,x=Math.min(Math.max((anchorPoint.x+1)/2*w,half+16),w-half-16),y=Math.min(Math.max((1-anchorPoint.y)/2*h,32),h-130),dx=x-cx,dy=y-cy,len=Math.hypot(dx,dy)||1;
-  // One transform per chip, written only when it moved: per-frame custom-property writes cost style recalcs.
-  const tx=x+dx/len*48*spread,ty=y+dy/len*48*spread,key=Math.round(tx*2)+','+Math.round(ty*2);
-  if(chip._key!==key){chip._key=key;chip.style.transform=`translate(${tx.toFixed(1)}px,${ty.toFixed(1)}px)`;}
+ const across=cornerW[1].clone().sub(tl),down=bl.clone().sub(tl);
+ const project=(u,v)=>{anchorPoint.copy(tl).addScaledVector(across,u).addScaledVector(down,v).project(camera);return [(anchorPoint.x+1)/2*w,(1-anchorPoint.y)/2*h];};
+ chips.forEach((chip,i)=>{
+  const u0=+chip.dataset.u,v=+chip.dataset.v,u=side>0?u0:1-u0;
+  const pop=reduced?1:clamp((now-start-2500-i*160)/650),e=popEase(pop);
+  // From a point just inside the screen to the chip's spot outside it.
+  const [ox,oy]=project(Math.min(Math.max(u,.18),.82),Math.min(Math.max(v,.18),.82)),[ax,ay]=project(u,v);
+  const half=chipHalf[i]||60;
+  let x=ox+(ax-ox)*e,y=oy+(ay-oy)*e;
+  x=Math.min(Math.max(x,half+16),w-half-16);y=Math.min(Math.max(y,32),h-130);// on screen, clear of the dock
+  const dx=x-cx,dy=y-cy,len=Math.hypot(dx,dy)||1,tx=x+dx/len*90*spread,ty=y+dy/len*90*spread;
+  const opacity=Math.max(0,Math.min(1,pop*1.6)*(1-smooth(.05,.22,p)));
+  // One transform per chip, written only when it changed: per-frame style writes cost recalcs.
+  const key=Math.round(tx*2)+','+Math.round(ty*2)+','+opacity.toFixed(2);
+  if(chip._key!==key){chip._key=key;chip.style.transform=`translate(${tx.toFixed(1)}px,${ty.toFixed(1)}px)`;chip.style.opacity=opacity.toFixed(2);}
  });
 }
 const layoutObserver=new ResizeObserver(resize);layoutObserver.observe(host);layoutObserver.observe(heroCopy);resize();
@@ -363,7 +374,7 @@ function frame(now){requestAnimationFrame(frame);if(document.hidden){lastNow=0;l
  const p=progress();updatePage(p);if(p>=1&&!reduced){lastRenderAt=0;return;}
  if(reduced){sx=sy=0;}else{sx=THREE.MathUtils.damp(sx,px,6,dt);sy=THREE.MathUtils.damp(sy,py,6,dt);if(Math.abs(sx-px)<1e-4)sx=px;if(Math.abs(sy-py)<1e-4)sy=py;}
  settleSpin(dt);
- const {openAmount,intro}=pose(now,p);updateScreen(now,p,dt);mapPanel(p);placeChips(p);
+ const {openAmount,intro}=pose(now,p);updateScreen(now,p,dt);mapPanel(p);placeChips(p,now);
  const renderKey=[p.toFixed(5),openAmount.toFixed(5),intro.toFixed(5),sx.toFixed(4),sy.toFixed(4),spin.yaw.toFixed(4),spin.pitch.toFixed(4),screenMix.toFixed(4),screenRevision].join(':');
  if(renderDirty||renderKey!==lastRenderKey){renderer.render(scene,camera);lastRenderKey=renderKey;renderDirty=false;governFrameRate(now);}else lastRenderAt=0;
 }
