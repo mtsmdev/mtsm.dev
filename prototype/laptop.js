@@ -12,8 +12,7 @@ const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isInte
 // Tilt follows a mouse or pen; touch scrolling must not shake the laptop.
 window.addEventListener('pointermove',e=>{if(e.pointerType==='touch')return;px=e.clientX/innerWidth-.5;py=e.clientY/innerHeight-.5;},{passive:true});
 const heroCopy=document.querySelector('.hero-copy'),annotation=document.querySelector('.laptop-panel'),workReveals=[...work.querySelectorAll('.reveal')];
-const panel=work.querySelector('.work-screen'),workBody=work.querySelector('.work-body');
-if(!reduced)panel.style.opacity='0';// shown on the laptop screen once scrolling starts
+const panel=work.querySelector('.work-screen'),hero=journey.querySelector('.hero');
 let journeyTop=0,journeyEnd=1,lastPageProgress=-1,projectsRevealed=false;
 function measureJourney(){journeyTop=journey.getBoundingClientRect().top+window.scrollY;journeyEnd=Math.max(1,journey.offsetHeight-innerHeight);lastPageProgress=-1;}
 measureJourney();window.addEventListener('resize',measureJourney,{passive:true});
@@ -21,13 +20,12 @@ new ResizeObserver(measureJourney).observe(journey);
 function progress(){return clamp((window.scrollY-journeyTop)/journeyEnd);}
 function updatePage(p){
  if(p===lastPageProgress)return;lastPageProgress=p;
- const remaining=Math.max(0,journeyTop+journeyEnd-window.scrollY);
  heroCopy.style.opacity=1-smooth(.03,.27,p);heroCopy.style.transform=`translateY(${-smooth(0,.3,p)*50}px)`;heroCopy.style.visibility=p>.3?'hidden':'visible';annotation.style.opacity=1-smooth(.35,.65,p);
  if(reduced){work.style.opacity=1;work.style.transform='';work.style.pointerEvents='auto';}
  else{
-  // The section is pinned during the journey. Its opening panel rides on the laptop screen (mapPanel);
-  // the timeline below fades in as the screen fills the page.
-  work.style.opacity=1;work.style.transform=`translateY(${-remaining}px)`;workBody.style.opacity=smooth(.85,.97,p);work.style.pointerEvents=p>.93?'auto':'none';
+  // Nothing here is moved by script while scrolling: the panel lives in the sticky hero next to the
+  // canvas (see mapPanel), so the browser keeps them together even when it scrolls off the main thread.
+  work.style.opacity=1;
   if(p>=1){panel.style.transform='none';panel.style.opacity='1';}
  }
  if(p>.84&&!projectsRevealed){projectsRevealed=true;workReveals.forEach(e=>e.classList.add('visible'));}
@@ -205,10 +203,16 @@ measureLaptop();
 // Camera distance at which the screen is exactly as wide as the page.
 const fitDistance=()=>finalScreen.center.z+finalScreen.width/2/(Math.tan(THREE.MathUtils.degToRad(17.5))*camera.aspect);
 let panelTop=0,panelW=1,panelH=1,panelShown=true;
+// The panel moves into the sticky hero for the journey. Inside the hero it shares the canvas's
+// position on screen, and when the journey ends the hero scrolls away taking it along, exactly
+// where the section expects it. Without WebGL or with reduced motion it stays in the section.
+if(!reduced){panel.style.opacity='0';hero.append(panel);document.body.classList.add('journey-on');}
 function layoutPanel(){
  // The panel's place in the page: full width, centred on the viewport, exactly where the screen ends up.
  panelW=host.clientWidth;panelH=panelW/screenAspect;panelTop=(host.clientHeight-panelH)/2;
- work.style.setProperty('--panel-offset',panelTop.toFixed(1)+'px');
+ panel.style.top=panelTop.toFixed(1)+'px';
+ // The section reserves the panel's space, so the timeline starts right below it.
+ work.style.setProperty('--panel-space',Math.min(panelTop+panelH,host.clientHeight).toFixed(1)+'px');
 }
 // CSS matrix3d that maps the panel box (w x h) onto a quad: the perspective projection of a square.
 function quadMatrix(w,h,[x0,y0,x1,y1,x2,y2,x3,y3]){
