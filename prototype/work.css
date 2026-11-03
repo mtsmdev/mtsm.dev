@@ -35,7 +35,7 @@ h1{font-size:clamp(60px,8.4vw,148px)}
 .work-screen-inner{position:relative;height:100%;display:flex;flex-direction:column;justify-content:center;padding:0 7cqw;gap:2.4cqw}
 .work-screen h2{margin:0;font-size:12.5cqw;line-height:.86;letter-spacing:-.02em;text-wrap:balance}
 .work-sub{margin:0;font-size:clamp(15px,2.1cqw,32px);line-height:1.35;color:#c4bcae;max-width:30ch}
-.work-ruler{list-style:none;margin:2cqw 0 0;padding:0;display:flex;justify-content:space-between;border-top:1px solid var(--line-2);font-size:clamp(11px,1.15cqw,17px);font-variant-numeric:tabular-nums;color:var(--muted-2)}
+.work-ruler{list-style:none;margin:max(6cqw,40px) 0 0;padding:0;display:flex;justify-content:space-between;border-top:1px solid var(--line-2);font-size:clamp(11px,1.15cqw,17px);font-variant-numeric:tabular-nums;color:var(--muted-2)}
 .work-ruler li{position:relative;padding-top:1.4cqw;color:var(--bone)}
 /* Dots are centred on the 1px ruler line: the li starts right under the border, so the line's centre is at -0.5px. */
 .ruler-dot{position:absolute;top:-.5px;inset-inline-start:0;width:.9cqw;height:.9cqw;min-width:6px;min-height:6px;border-radius:50%;background:var(--orange);box-shadow:0 0 0 .4cqw #ff641b2e;translate:0 -50%}
@@ -274,3 +274,20 @@ html[lang=ar] .tl-card h3{line-height:1.4}
 @media(min-width:761px){.work .project-filters{padding-inline-start:204px}}
 @media(max-width:760px){.work .project-filters{padding-inline-start:44px}}
 .work-body>.timeline{margin-inline:auto}/* its own margin:0 had undone the centring */
+
+/* Key moments on the opening ruler: a small tag with an icon and a tick down to its dot. */
+.ruler-mark{position:absolute;bottom:calc(100% + max(1.2cqw,8px));inset-inline-start:max(.45cqw,3px);translate:-50% 0;display:inline-flex;align-items:center;gap:.4em;padding:.3em .65em;border-radius:999px;border:1px solid #ffffff1f;background:#1e1c18;color:#cfc7b9;font-size:clamp(10px,1.05cqw,15px);font-weight:500;white-space:nowrap;line-height:1.2}
+[dir=rtl] .ruler-mark{translate:50% 0}
+.ruler-mark .icon{width:1.15em;height:1.15em;color:var(--orange)}
+.ruler-mark::after{content:'';position:absolute;top:100%;left:50%;width:1px;height:max(1.2cqw,8px);background:#ffffff26}
+@container (width < 560px){.work-ruler .ruler-minor{display:none}}
+.work-ruler li:first-child .ruler-mark{inset-inline-start:-.5em;translate:0}.work-ruler li:first-child .ruler-mark::after{left:calc(.5em + max(.45cqw,3px))}[dir=rtl] .work-ruler li:first-child .ruler-mark::after{left:auto;right:calc(.5em + max(.45cqw,3px))}
+
+/* Narrow ruler: the key years keep only their icon, centred over the dot, so neighbours never collide. */
+@container (width < 560px){
+ .work-ruler .ruler-mark{padding:.38em;font-size:12px}
+ .work-ruler .ruler-mark>span{display:none}
+ .work-ruler li:first-child .ruler-mark{inset-inline-start:max(.45cqw,3px);translate:-50% 0}
+ [dir=rtl] .work-ruler li:first-child .ruler-mark{translate:50% 0}
+ .work-ruler li:first-child .ruler-mark::after,[dir=rtl] .work-ruler li:first-child .ruler-mark::after{left:50%;right:auto}
+}
