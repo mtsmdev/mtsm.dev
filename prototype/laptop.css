@@ -41,3 +41,5 @@
 /* The back layer sits under the laptop canvas, so the lid partly covers those chips. */
 .skill-orbit-back{z-index:0}
 .skill-orbit-back .skill-float{background:#17150fe6;color:#bdb5a7}
+/* Front chips paint above the projects panel, which joins the hero after them. */
+.skill-orbit:not(.skill-orbit-back){z-index:4}

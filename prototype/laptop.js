@@ -422,7 +422,7 @@ for(let i=0,quick=0,last=await nextFrame();i<30&&quick<2;i++){renderer.render(sc
 let lastRenderKey='',lastNow=0;
 function frame(now){requestAnimationFrame(frame);if(document.hidden){lastNow=0;lastRenderAt=0;return;}
  const dt=lastNow?Math.min(.1,(now-lastNow)/1000):1/60;lastNow=now;
- const p=progress();updatePage(p);if(p>=1&&!reduced){lastRenderAt=0;return;}
+ const p=progress();updatePage(p);if(p>=1&&!reduced){placeChips(p,now);lastRenderAt=0;return;}// hides the chips even after a jump to the end
  if(reduced){sx=sy=0;}else{sx=THREE.MathUtils.damp(sx,px,6,dt);sy=THREE.MathUtils.damp(sy,py,6,dt);if(Math.abs(sx-px)<1e-4)sx=px;if(Math.abs(sy-py)<1e-4)sy=py;}
  settleSpin(dt);
  const {openAmount,intro}=pose(now,p);updateScreen(now,p,dt);mapPanel(p);placeChips(p,now);
