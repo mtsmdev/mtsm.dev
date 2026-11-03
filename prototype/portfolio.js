@@ -164,3 +164,6 @@ if(matchMedia('(hover: hover) and (pointer: fine)').matches&&!matchMedia('(prefe
  },{passive:true});
  document.addEventListener('pointerleave',()=>{if(tilted){reset(tilted);tilted=null;}});
 }
+
+// 'Print CV' in the dock: print.css turns the page into a CV.
+document.querySelector('[data-print]')?.addEventListener('click',()=>print());
