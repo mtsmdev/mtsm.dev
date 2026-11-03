@@ -150,9 +150,19 @@ const fitBox=new THREE.Box3(),fitCam=new THREE.PerspectiveCamera(35,1,.03,100),c
 let fitScale=1,fitX=0,fitY=0;
 // Right-to-left pages put the text on the right, so the laptop mirrors to the left side.
 let side=document.documentElement.dir==='rtl'?-1:1;
+// A tight outline of the opened laptop: the corners of every part's own box (far closer to the visible
+// shape than one box around the whole rotated model).
+const hull=[];
 function measureLaptop(){
  laptop.rotation.set(.12,-.42*side,-.055*side);laptop.scale.setScalar(1);laptop.position.set(0,0,0);lid.rotation.x=0;
  laptop.updateMatrixWorld(true);fitBox.setFromObject(laptop);
+ hull.length=0;
+ laptop.traverse(m=>{
+  if(!m.isMesh)return;
+  if(!m.geometry.boundingBox)m.geometry.computeBoundingBox();
+  const b=m.geometry.boundingBox;
+  for(let i=0;i<8;i++)hull.push(new THREE.Vector3(i&1?b.max.x:b.min.x,i&2?b.max.y:b.min.y,i&4?b.max.z:b.min.z).applyMatrix4(m.matrixWorld));
+ });
 }
 measureLaptop();
 function fitPortrait(w,h){
@@ -244,24 +254,31 @@ function fitLandscape(w,h){
  landScale=Math.min(h<520?.78:1.04,viewWidth*.39/4.7);landX=viewWidth*.25*side;landY=0;
  const bounds=()=>{
   let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
-  for(let i=0;i<8;i++){
-   corner.set(i&1?fitBox.max.x:fitBox.min.x,i&2?fitBox.max.y:fitBox.min.y,i&4?fitBox.max.z:fitBox.min.z).multiplyScalar(landScale);
+  for(const point of hull){
+   corner.copy(point).multiplyScalar(landScale);
    corner.x+=landX;corner.y+=landY;corner.project(fitCam);
    const x=(corner.x+1)/2*w,y=(1-corner.y)/2*h;minX=Math.min(minX,x);maxX=Math.max(maxX,x);minY=Math.min(minY,y);maxY=Math.max(maxY,y);
   }
   return {minX,maxX,minY,maxY};
  };
- for(let pass=0;pass<4;pass++){
-  const b=bounds();
+ // Horizontally it stays beside the text: centred in the free space between the text and the far edge,
+ // smaller if it does not fit. Vertically it is centred on the viewport.
+ // The text column ends where the intro's text and the buttons actually end (their boxes are full width).
+ const range=document.createRange();range.selectNodeContents(heroCopy.querySelector('.intro'));
+ const copy=[range.getBoundingClientRect(),...[...heroCopy.querySelector('.actions').children].map(e=>e.getBoundingClientRect())];
+ const near=side>0?Math.max(...copy.map(c=>c.right))+32:w-Math.min(...copy.map(c=>c.left))+32,far=w*.03;
+ const lo=side>0?near:far,hi=side>0?w-far:w-near;
+ for(let pass=0;pass<5;pass++){
+  const b=bounds(),width=b.maxX-b.minX;
+  if(width>hi-lo){landScale*=(hi-lo)/width;landX*=(hi-lo)/width;landY*=(hi-lo)/width;continue;}
   landY+=((b.minY+b.maxY)/2-h/2)*perPx;
-  if(side>0&&b.maxX>w*.97)landX-=(b.maxX-w*.97)*perPx;
-  if(side<0&&b.minX<w*.03)landX+=(w*.03-b.minX)*perPx;
+  landX+=((lo+hi)/2-(b.minX+b.maxX)/2)*perPx;
  }
 }
 // Skill chips are anchored to points around the laptop screen, in the screen's own frame: u runs along
 // the top edge (0 = left corner, 1 = right), v down the side (0 = top, 1 = hinge). Projected every frame,
 // so they follow the laptop's tilt. Mirrored for RTL; each drifts straight away from the laptop on scroll.
-const chipAnchors=[[.1,-.24],[.56,-.32],[1.02,-.2],[-.2,.45],[.02,1.3],[.5,1.46],[.98,1.34]];
+const chipAnchors=[[.1,-.26],[.56,-.34],[1.0,-.22],[1.13,.42]];// above the screen, and beside its outer edge
 const anchorPoint=new THREE.Vector3(),cornerW=[0,1,2,3].map(()=>new THREE.Vector3());
 let chipsShown=true;
 function placeChips(p){
@@ -279,7 +296,7 @@ function placeChips(p){
   // Keep every chip on screen and clear of the dock.
   const half=(chip.offsetWidth||120)/2,x=Math.min(Math.max((anchorPoint.x+1)/2*w,half+16),w-half-16),y=Math.min(Math.max((1-anchorPoint.y)/2*h,32),h-130),dx=x-cx,dy=y-cy,len=Math.hypot(dx,dy)||1;
   chip.style.setProperty('--cx',x.toFixed(1)+'px');chip.style.setProperty('--cy',y.toFixed(1)+'px');
-  chip.style.setProperty('--dx',(dx/len*180).toFixed(0)+'px');chip.style.setProperty('--dy',(dy/len*180).toFixed(0)+'px');
+  chip.style.setProperty('--dx',(dx/len*48).toFixed(0)+'px');chip.style.setProperty('--dy',(dy/len*48).toFixed(0)+'px');
  });
 }
 const layoutObserver=new ResizeObserver(resize);layoutObserver.observe(host);layoutObserver.observe(heroCopy);resize();
