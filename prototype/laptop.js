@@ -141,6 +141,7 @@ function resize(){
  portrait=camera.aspect<.9;freeTop=heroActions?heroCopy.offsetTop+heroActions.offsetTop+heroActions.offsetHeight:0;
  // Portrait: the laptop tabs sit between the buttons and the laptop.
  if(portrait)fitPortrait(w,h);else fitLandscape(w,h);
+ if(typeof measureChips==='function')measureChips();
  layoutPanel();
  renderDirty=true;
 }
@@ -281,6 +282,8 @@ function fitLandscape(w,h){
 const chipAnchors=[[.1,-.26],[.56,-.34],[1.0,-.22],[1.13,.42]];// above the screen, and beside its outer edge
 const anchorPoint=new THREE.Vector3(),cornerW=[0,1,2,3].map(()=>new THREE.Vector3());
 let chipsShown=true;
+// Chip widths only change on resize; reading them per frame would force a layout after every write.
+let chipHalf=[];const measureChips=()=>{if(orbit)chipHalf=[...orbit.children].map(c=>c.offsetWidth/2);};
 function placeChips(p){
  if(!orbit)return;
  const show=!portrait&&p<.3;
@@ -288,15 +291,16 @@ function placeChips(p){
  if(!chipsShown){orbit.style.visibility='';chipsShown=true;}
  laptop.updateMatrixWorld(true);camera.updateMatrixWorld();
  screenCorners.forEach((c,i)=>cornerW[i].copy(c).applyMatrix4(display.matrixWorld));
- const [tl,tr,,bl]=cornerW,w=host.clientWidth,h=host.clientHeight;
+ const [tl,tr,,bl]=cornerW,w=host.clientWidth,h=host.clientHeight,spread=smooth(0,.24,p);
  const centre=anchorPoint.copy(tl).lerp(cornerW[2],.5).project(camera),cx=(centre.x+1)/2*w,cy=(1-centre.y)/2*h;
  [...orbit.children].forEach((chip,i)=>{
   const [u0,v]=chipAnchors[i%chipAnchors.length],u=side>0?u0:1-u0;
   anchorPoint.copy(tl).addScaledVector(cornerW[1].clone().sub(tl),u).addScaledVector(bl.clone().sub(tl),v).project(camera);
   // Keep every chip on screen and clear of the dock.
-  const half=(chip.offsetWidth||120)/2,x=Math.min(Math.max((anchorPoint.x+1)/2*w,half+16),w-half-16),y=Math.min(Math.max((1-anchorPoint.y)/2*h,32),h-130),dx=x-cx,dy=y-cy,len=Math.hypot(dx,dy)||1;
-  chip.style.setProperty('--cx',x.toFixed(1)+'px');chip.style.setProperty('--cy',y.toFixed(1)+'px');
-  chip.style.setProperty('--dx',(dx/len*48).toFixed(0)+'px');chip.style.setProperty('--dy',(dy/len*48).toFixed(0)+'px');
+  const half=chipHalf[i]||60,x=Math.min(Math.max((anchorPoint.x+1)/2*w,half+16),w-half-16),y=Math.min(Math.max((1-anchorPoint.y)/2*h,32),h-130),dx=x-cx,dy=y-cy,len=Math.hypot(dx,dy)||1;
+  // One transform per chip, written only when it moved: per-frame custom-property writes cost style recalcs.
+  const tx=x+dx/len*48*spread,ty=y+dy/len*48*spread,key=Math.round(tx*2)+','+Math.round(ty*2);
+  if(chip._key!==key){chip._key=key;chip.style.transform=`translate(${tx.toFixed(1)}px,${ty.toFixed(1)}px)`;}
  });
 }
 const layoutObserver=new ResizeObserver(resize);layoutObserver.observe(host);layoutObserver.observe(heroCopy);resize();
