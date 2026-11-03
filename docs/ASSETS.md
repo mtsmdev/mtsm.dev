@@ -14,7 +14,7 @@ The manifest retains the source URL. `xps-reference.js` adapts the geometry and 
 
 ## CV and project imagery
 
-The CV PDF, its rendered preview, and Amposter screenshots were provided by Moatasem via his CV. The ThermaVoltFlow screenshot comes from the project repository:
+The Amposter screenshots were provided by Moatasem (taken from his CV). The ThermaVoltFlow screenshot comes from the project repository:
 
 https://github.com/mtsmdev/thermavolt/blob/main/docs/design-concepts/implemented-simulation-controls.jpg
 
