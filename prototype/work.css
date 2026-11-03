@@ -185,6 +185,7 @@ html[lang=ar] .cursor-label{font-family:'IBM Plex Sans Arabic',sans-serif;letter
 .cursor[data-state=text] .cursor-ring{width:4px;height:30px;margin:-15px 0 0 -2px;border-radius:2px;border-color:transparent;background:#e9e2d4aa}
 .cursor[data-state=text] .cursor-dot{opacity:0}
 .cursor.pressed .cursor-ring{scale:.82}
+.cursor[data-state=text].pressed .cursor-ring{scale:1}
 .cursor-ring{transition-property:width,height,margin,background,border-color,border-radius,scale}
 [data-magnetic]{transition:translate .35s var(--ease-out),background .3s,box-shadow .4s,border-color .3s,color .3s}
 

@@ -15,6 +15,7 @@ const labels={nl:{drag:'Sleep',open:'Open'},en:{drag:'Drag',open:'Open'},ar:{dra
 const text=key=>(labels[window.i18n?.lang]||labels.nl)[key];
 function setState(next){
  if(next===state)return;state=next;cursor.dataset.state=next;
+ if(next==='text'){ringPos.x=pos.x;ringPos.y=pos.y;}
  label.textContent=next==='drag'?text('drag'):next==='open'?text('open'):'';
 }
 function stateFor(target){
@@ -28,8 +29,9 @@ function stateFor(target){
 }
 function frame(now){
  const dt=last?Math.min(.05,(now-last)/1000):1/60;last=now;
- // The ring trails the dot with frame-rate-independent easing.
- const k=reduced?1:1-Math.exp(-dt*18);
+ // The ring trails the dot with frame-rate-independent easing, except over text: there it is the
+ // insertion bar and must sit exactly where a click or a selection will start.
+ const k=reduced||state==='text'?1:1-Math.exp(-dt*18);
  ringPos.x+=(pos.x-ringPos.x)*k;ringPos.y+=(pos.y-ringPos.y)*k;
  dot.style.transform=`translate3d(${pos.x}px,${pos.y}px,0)`;
  ring.style.transform=`translate3d(${ringPos.x}px,${ringPos.y}px,0)`;
