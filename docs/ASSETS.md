@@ -21,3 +21,10 @@ https://github.com/mtsmdev/thermavolt/blob/main/docs/design-concepts/implemented
 ## Fonts
 
 Google Fonts provides DM Sans and Barlow Condensed through the stylesheet imports. Their external availability affects font loading; the site includes system fallbacks.
+Arabic text uses Alexandria (headings) and IBM Plex Sans Arabic (text), also from Google Fonts.
+
+## Icons
+
+- Technology and brand logos in `prototype/assets/icons/` come from [Simple Icons](https://simpleicons.org) 16.36.0 (CC0 1.0). The logos remain trademarks of their owners and are used only to name the technology.
+- `grpc.svg`, `angularmaterial.svg`, `windows11.svg`, `powershell.svg`, `java.svg` and `linkedin.svg` come from [devicon](https://devicon.dev) 2.18.0 (MIT). `rxjs.svg` and `motion.svg` are also from devicon but are not currently used.
+- Interface icons (navigation, arrows, copy, lock) are [Lucide](https://lucide.dev) 1.66.0 (ISC), inlined as an SVG sprite in `index.html`.

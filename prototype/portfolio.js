@@ -1,5 +1,5 @@
 const filters=document.querySelectorAll('[data-filter]');
-const projects=document.querySelectorAll('.archive-project');
+const projects=document.querySelectorAll('.tl-project');
 const laptopAction=document.getElementById('laptop-action'),primaryAction=document.querySelector('.hero .primary');
 const modeLinks={work:'#work',cv:'assets/moatasem-cv.pdf',contact:'mailto:career@mtsm.dev'};
 // Button, label and headline for a mode, in the current language (see i18n.js).
@@ -64,7 +64,7 @@ function setLaptopMode(mode,rebuild=false){
  document.querySelectorAll('[data-laptop-mode]').forEach(tab=>tab.setAttribute('aria-pressed',String(tab.dataset.laptopMode===mode)));
  for(const link of [laptopAction,primaryAction]){link.setAttribute('href',copy.href);link.setAttribute('aria-label',copy.label);if(mode==='cv'){link.target='_blank';link.rel='noopener';}else{link.removeAttribute('target');link.removeAttribute('rel');}}
  laptopAction.textContent=copy.label;
- primaryAction.textContent=copy.button;
+ primaryAction.querySelector('.btn-label').textContent=copy.button;
  const heading=document.querySelector('.hero h1');
  const current=heading.dataset.mode;
  if(current!==mode||rebuild){
@@ -121,8 +121,11 @@ document.querySelectorAll('[data-laptop-mode]').forEach(tab=>tab.addEventListene
 setLaptopMode(location.hash==='#cv'?'cv':'work');
 filters.forEach(button=>button.addEventListener('click',()=>{
  filters.forEach(b=>{b.classList.toggle('active',b===button);b.setAttribute('aria-pressed',String(b===button));});
- let count=0;
- projects.forEach(project=>{const show=button.dataset.filter==='all'||project.dataset.category===button.dataset.filter;project.hidden=!show;if(show)count++;});
+ // Projects can belong to several categories; milestones only show on the full timeline.
+ const filter=button.dataset.filter;let count=0;
+ projects.forEach(project=>{const show=filter==='all'||project.dataset.category.split(' ').includes(filter);project.hidden=!show;if(show)count++;});
+ document.querySelectorAll('.tl-milestone').forEach(m=>{m.hidden=filter!=='all';});
+ document.querySelectorAll('.tl-year').forEach(year=>{year.hidden=!year.querySelector('.tl-item:not([hidden])');});
  updateCount(count);
 }));
 const counter=document.querySelector('.filter-count');
@@ -160,3 +163,15 @@ for(const button of document.querySelectorAll('.copy-email')){
   clearTimeout(button._reset);button._reset=setTimeout(()=>{label.textContent=i18n.t('contact.copy');use.setAttribute('href','#i-copy');button.classList.remove('copied');},2200);
  });
 }
+
+// Cards light up where the pointer is (a radial highlight that follows it).
+document.querySelector('.timeline')?.addEventListener('pointermove',event=>{
+ const card=event.target.closest('.tl-card');if(!card||event.pointerType==='touch')return;
+ const box=card.getBoundingClientRect();
+ card.style.setProperty('--mx',((event.clientX-box.left)/box.width*100).toFixed(1)+'%');
+ card.style.setProperty('--my',((event.clientY-box.top)/box.height*100).toFixed(1)+'%');
+},{passive:true});
+
+// Timeline items and years light up as they pass through the middle of the screen.
+const lightUp=new IntersectionObserver(entries=>{for(const e of entries)e.target.classList.toggle('in-view',e.isIntersecting||e.boundingClientRect.top<0);},{rootMargin:'0px 0px -45% 0px'});
+document.querySelectorAll('.tl-item,.tl-year').forEach(el=>lightUp.observe(el));
