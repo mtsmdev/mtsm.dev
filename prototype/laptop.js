@@ -24,6 +24,7 @@ function updatePage(p){
  else{work.style.opacity=smooth(.85,.97,p);work.style.transform=`translateY(${-remaining}px)`;work.style.pointerEvents=p>.93?'auto':'none';}
  if(p>.84&&!projectsRevealed){projectsRevealed=true;workReveals.forEach(e=>e.classList.add('visible'));}
 }
+const nextFrame=()=>new Promise(resolve=>requestAnimationFrame(resolve));
 try{
 const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:'high-performance'});renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
 const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(35,1,.03,100),pmrem=new THREE.PMREMGenerator(renderer),room=new RoomEnvironment();scene.environment=pmrem.fromScene(room,.04).texture;room.dispose();pmrem.dispose();
@@ -42,7 +43,7 @@ const projectTexture=new THREE.CanvasTexture(projectCanvas);projectTexture.color
 const stripCanvas=document.createElement('canvas'),stripCtx=stripCanvas.getContext('2d'),stripTexture=new THREE.CanvasTexture(stripCanvas),stripAt=new THREE.Vector2();
 const screenMixUniform={value:0};
 const projectImage=new Image(),amposterImage=new Image(),cvImage=new Image();
-let renderDirty=true,screenDirty=true,screenRevision=0;
+let renderDirty=true,screenDirty=true,screenRevision=0,booted=false;
 function screenArt(){const ctx=projectCtx;
  ctx.fillStyle='#141414';ctx.fillRect(0,0,1600,1000);
  ctx.fillStyle='#eeeae1';ctx.font='600 16px monospace';ctx.fillText('VAN IDEE NAAR WERKENDE SOFTWARE',65,95);
@@ -54,9 +55,11 @@ function screenArt(){const ctx=projectCtx;
  if(amposterImage.complete&&amposterImage.naturalWidth){ctx.fillStyle='#d8d0c2';ctx.fillRect(920,635,615,365);ctx.drawImage(amposterImage,920,635,615,615*amposterImage.naturalHeight/amposterImage.naturalWidth);}
  projectTexture.needsUpdate=true;renderDirty=true;
 }
-projectImage.onload=screenArt;amposterImage.onload=screenArt;
+// Late arrivals after the intro started still redraw, but normally everything is ready before boot.
+const redrawArt=()=>{if(booted)screenArt();};
+projectImage.onload=redrawArt;amposterImage.onload=redrawArt;
 cvImage.src='./assets/projects/cv-preview.png';projectImage.src='./assets/projects/thermavolt.jpg';amposterImage.src='./assets/projects/amposter-web.jpg';
-screenArt();document.fonts.ready.then(screenArt);
+document.fonts.ready.then(redrawArt);
 
 // Cross-fade between the live view and the project art in the shader instead of on the canvas.
 display.material.color.set(0xffffff);display.material.toneMapped=false;// A display emits its own image.
@@ -142,6 +145,19 @@ function pose(now,p){
  return {openAmount,intro};
 }
 
+// Warm up before the intro starts: wait for fonts and images, upload every texture and compile
+// the shaders, then render the first pose. Otherwise that work lands in the first frames of the
+// lid animation and makes it jump.
+const loaded=img=>img.decode().catch(()=>{});
+await Promise.race([Promise.all([document.fonts.ready,loaded(projectImage),loaded(amposterImage),loaded(cvImage)]),new Promise(resolve=>setTimeout(resolve,2500))]);
+screenArt();paintFullScreen(document.body.dataset.laptopMode||'work',0);
+scene.traverse(object=>{const m=object.material;if(m)for(const slot of ['map','aoMap','alphaMap'])if(m[slot])renderer.initTexture(m[slot]);});
+renderer.initTexture(screenTexture);renderer.initTexture(projectTexture);
+await renderer.compileAsync(scene,camera);
+start=modeStarted=performance.now();pose(start,progress());
+// Keep rendering the first pose until the GPU has drained the uploads (two quick frames in a row).
+for(let i=0,quick=0,last=await nextFrame();i<30&&quick<2;i++){renderer.render(scene,camera);const now=await nextFrame();quick=now-last<25?quick+1:0;last=now;}
+
 let lastRenderKey='',lastNow=0;
 function frame(now){requestAnimationFrame(frame);if(document.hidden){lastNow=0;lastRenderAt=0;return;}
  const dt=lastNow?Math.min(.1,(now-lastNow)/1000):1/60;lastNow=now;
@@ -151,6 +167,7 @@ function frame(now){requestAnimationFrame(frame);if(document.hidden){lastNow=0;l
  const renderKey=[p.toFixed(5),openAmount.toFixed(5),intro.toFixed(5),sx.toFixed(4),sy.toFixed(4),screenMix.toFixed(4),screenRevision].join(':');
  if(renderDirty||renderKey!==lastRenderKey){renderer.render(scene,camera);lastRenderKey=renderKey;renderDirty=false;governFrameRate(now);}else lastRenderAt=0;
 }
-start=modeStarted=performance.now();document.body.classList.remove('booting');
+// The intro clock starts on the first frame the visitor actually sees.
+start=modeStarted=performance.now();booted=true;document.body.classList.remove('booting');
 requestAnimationFrame(frame);
 }catch(e){document.body.classList.remove('booting');canvas.hidden=true;host.querySelector('.fallback').hidden=false;console.error('Laptop scene unavailable',e);document.body.classList.add('no-webgl');window.addEventListener('scroll',()=>updatePage(progress()),{passive:true});updatePage(progress());}
