@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {RoomEnvironment} from './vendor/RoomEnvironment.js';
 import {createXPS} from './xps-reference.js';
-import {drawEditor,editorState,editorDirtyRects} from './editor-screen.js';
+import {drawEditor,editorState,editorDirtyRects,setEditorLanguage} from './editor-screen.js';
 import {drawCV,drawMail} from './laptop-views.js';
 const host=document.getElementById('sculpture'),canvas=document.getElementById('scene'),journey=document.querySelector('.scroll-journey'),work=document.getElementById('work');
 let reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,px=0,py=0,start=performance.now();
@@ -44,15 +44,23 @@ const stripCanvas=document.createElement('canvas'),stripCtx=stripCanvas.getConte
 const screenMixUniform={value:0};
 const projectImage=new Image(),amposterImage=new Image(),cvImage=new Image();
 let renderDirty=true,screenDirty=true,screenRevision=0,booted=false;
-function screenArt(){const ctx=projectCtx;
+// The project art mirrors the projects section it fades into, so it follows the language and,
+// for Arabic, the right-to-left layout.
+const artCopy={nl:{eyebrow:'PROJECTEN',title:['GESELECTEERD','WERK.']},en:{eyebrow:'PROJECTS',title:['SELECTED','WORK.']},ar:{eyebrow:'المشاريع',title:['أعمال','مختارة.']}};
+const pageLang=()=>window.i18n?.lang||'nl';
+const loadArabicFonts=()=>['800 128px Alexandria','400 24px "IBM Plex Sans Arabic"','700 24px "IBM Plex Sans Arabic"'].map(font=>document.fonts.load(font,'ب').catch(()=>{}));
+function screenArt(){const ctx=projectCtx,lang=pageLang(),copy=artCopy[lang]||artCopy.nl,rtl=lang==='ar';
+ const X=x=>rtl?1600-x:x,R=(x,w)=>rtl?1600-x-w:x;
+ ctx.save();ctx.direction=rtl?'rtl':'ltr';ctx.textAlign=rtl?'right':'left';
  ctx.fillStyle='#141414';ctx.fillRect(0,0,1600,1000);
- ctx.fillStyle='#eeeae1';ctx.font='600 16px monospace';ctx.fillText('PROJECTEN',65,95);
- ctx.font='800 150px "Barlow Condensed",Impact,sans-serif';ctx.fillText('GESELECTEERD',65,282);ctx.fillStyle='#8d8d8d';ctx.fillText('WERK.',65,425);
- ctx.fillStyle='#eeeae1';ctx.fillRect(65,493,1470,1);ctx.font='600 31px "DM Sans",sans-serif';ctx.fillText('ThermaVoltFlow Simulator',65,555);ctx.fillText('Amposter',940,555);
- ctx.font='16px monospace';ctx.fillStyle='#f28b53';ctx.fillText('SVELTE · PHP · LARAVEL · gRPC',65,595);ctx.fillText('REACT · FIREBASE · JAVA',940,595);
- if(projectImage.complete&&projectImage.naturalWidth){ctx.drawImage(projectImage,65,635,800,800*projectImage.naturalHeight/projectImage.naturalWidth);}else{ctx.fillStyle='#d3c8b6';ctx.fillRect(65,635,800,365);}
- ctx.fillStyle='#20221e';ctx.fillRect(920,635,615,365);ctx.fillStyle='#ff7a35';ctx.font='700 43px "DM Sans",sans-serif';ctx.fillText('Amposter',955,705);ctx.fillStyle='#141414';ctx.font='24px "DM Sans",sans-serif';ctx.fillText('Web + Android',955,762);ctx.font='19px "DM Sans",sans-serif';ctx.fillText('Accounts · Profielen · Berichten',955,816);ctx.fillText('Reacties · Groepen',955,855);ctx.fillStyle='#a7aa9a';ctx.font='16px monospace';ctx.fillText('PLUS EEN SPRING BOOT-BACKEND',955,934);
- if(amposterImage.complete&&amposterImage.naturalWidth){ctx.fillStyle='#d8d0c2';ctx.fillRect(920,635,615,365);ctx.drawImage(amposterImage,920,635,615,615*amposterImage.naturalHeight/amposterImage.naturalWidth);}
+ ctx.fillStyle='#eeeae1';ctx.font=rtl?'600 22px "IBM Plex Sans Arabic",sans-serif':'600 16px monospace';ctx.fillText(copy.eyebrow,X(65),95);
+ ctx.font=rtl?'800 128px Alexandria,"IBM Plex Sans Arabic",sans-serif':'800 150px "Barlow Condensed",Impact,sans-serif';ctx.fillText(copy.title[0],X(65),rtl?262:282);ctx.fillStyle='#8d8d8d';ctx.fillText(copy.title[1],X(65),rtl?420:425);
+ ctx.fillStyle='#eeeae1';ctx.fillRect(65,493,1470,1);ctx.font='600 31px "DM Sans",sans-serif';ctx.fillText('ThermaVoltFlow Simulator',X(65),555);ctx.fillText('Amposter',X(940),555);
+ ctx.font='16px monospace';ctx.fillStyle='#f28b53';ctx.fillText('SVELTE · PHP · LARAVEL · gRPC',X(65),595);ctx.fillText('REACT · FIREBASE · JAVA',X(940),595);
+ if(projectImage.complete&&projectImage.naturalWidth){ctx.drawImage(projectImage,R(65,800),635,800,800*projectImage.naturalHeight/projectImage.naturalWidth);}else{ctx.fillStyle='#d3c8b6';ctx.fillRect(R(65,800),635,800,365);}
+ ctx.fillStyle='#20221e';ctx.fillRect(R(920,615),635,615,365);ctx.fillStyle='#ff7a35';ctx.font='700 43px "DM Sans",sans-serif';ctx.fillText('Amposter',X(955),705);ctx.fillStyle='#a7aa9a';ctx.font='24px "DM Sans",sans-serif';ctx.fillText('Web + Android',X(955),762);
+ if(amposterImage.complete&&amposterImage.naturalWidth){ctx.fillStyle='#d8d0c2';ctx.fillRect(R(920,615),635,615,365);ctx.drawImage(amposterImage,R(920,615),635,615,615*amposterImage.naturalHeight/amposterImage.naturalWidth);}
+ ctx.restore();
  projectTexture.needsUpdate=true;renderDirty=true;
 }
 // Late arrivals after the intro started still redraw, but normally everything is ready before boot.
@@ -75,7 +83,7 @@ cvImage.onload=()=>{if((document.body.dataset.laptopMode||'work')==='cv')screenD
 window.addEventListener('laptopmodechange',()=>{modeStarted=performance.now();screenMix=0;screenDirty=true;});
 const viewSeconds=now=>(now-Math.max(start,modeStarted))/1000;
 function paintFullScreen(mode,seconds){
- if(mode==='cv')drawCV(ctx,cvImage);else if(mode==='contact')drawMail(ctx);else drawEditor(ctx,seconds,reduced);
+ if(mode==='cv')drawCV(ctx,cvImage,pageLang());else if(mode==='contact')drawMail(ctx,pageLang());else drawEditor(ctx,seconds,reduced);
  screenTexture.needsUpdate=true;shownMode=mode;shownEditor=mode==='work'?editorState(seconds,reduced):null;screenDirty=false;screenRevision++;
 }
 // Redraw one rectangle of the editor and upload just that strip into the screen texture.
@@ -156,7 +164,13 @@ function fitPortrait(w,h){
  }
 }
 const layoutObserver=new ResizeObserver(resize);layoutObserver.observe(host);layoutObserver.observe(heroCopy);resize();
-window.addEventListener('i18nchange',()=>{side=document.documentElement.dir==='rtl'?-1:1;measureLaptop();resize();});
+// A language switch mirrors the scene for RTL and redraws every screen once its fonts are loaded.
+window.addEventListener('i18nchange',async()=>{
+ side=document.documentElement.dir==='rtl'?-1:1;measureLaptop();resize();
+ setEditorLanguage(pageLang());
+ if(pageLang()==='ar')await Promise.all(loadArabicFonts());
+ screenArt();screenDirty=true;
+});
 let sampled=0,slow=0,lastRenderAt=0;
 function governFrameRate(now){
  const gap=lastRenderAt?now-lastRenderAt:0;lastRenderAt=now;
@@ -190,7 +204,9 @@ function pose(now,p){
 // the shaders, then render the first pose. Otherwise that work lands in the first frames of the
 // lid animation and makes it jump.
 const loaded=img=>img.decode().catch(()=>{});
-await Promise.race([Promise.all([document.fonts.ready,loaded(projectImage),loaded(amposterImage),loaded(cvImage)]),new Promise(resolve=>setTimeout(resolve,2500))]);
+setEditorLanguage(pageLang());
+const arabicFonts=pageLang()==='ar'?loadArabicFonts():[];
+await Promise.race([Promise.all([document.fonts.ready,...arabicFonts,loaded(projectImage),loaded(amposterImage),loaded(cvImage)]),new Promise(resolve=>setTimeout(resolve,2500))]);
 screenArt();paintFullScreen(document.body.dataset.laptopMode||'work',0);
 scene.traverse(object=>{const m=object.material;if(m)for(const slot of ['map','aoMap','alphaMap'])if(m[slot])renderer.initTexture(m[slot]);});
 renderer.initTexture(screenTexture);renderer.initTexture(projectTexture);

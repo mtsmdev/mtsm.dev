@@ -1,4 +1,10 @@
-const code=`// Software met oog voor detail.
+// The typed sample follows the page language: comment, lang attribute, headline and terminal hint.
+const copy={
+ nl:{comment:'Software met oog voor detail.',lang:'nl',dir:'',title:'Code met koffie.',hint:'Scroll naar beneden voor mijn projecten.'},
+ en:{comment:'Software with an eye for detail.',lang:'en',dir:'',title:'Code with coffee.',hint:'Scroll down to see my projects.'},
+ ar:{comment:'برمجيات تهتم بالتفاصيل',lang:'ar',dir:' dir="rtl"',title:'برمجة بالقهوة',hint:'مرّر للأسفل لمشاهدة مشاريعي'}
+};
+const sample=c=>`// ${c.comment}
 const developer = "Moatasem Al-Refaai";
 
 const projects = [
@@ -8,13 +14,21 @@ const projects = [
 
 export function Portfolio() {
   return (
-    <main lang="nl">
-      <h1>Code met koffie.</h1>
+    <main lang="${c.lang}"${c.dir}>
+      <h1>${c.title}</h1>
       <Projects items={projects} />
     </main>
   );
 }
 `;
+let text=copy.nl,code=sample(text);
+export function setEditorLanguage(lang){text=copy[lang]||copy.nl;code=sample(text);}
+const arabic=/[؀-ۿ]/;
+// Arabic runs are drawn as one piece in a right-to-left context so the words keep their order.
+function fillMixed(ctx,value,x,y){
+ if(!arabic.test(value)){ctx.fillText(value,x,y);return;}
+ ctx.save();ctx.direction='rtl';ctx.textAlign='left';ctx.fillText(value,x,y);ctx.restore();
+}
 const lineOf=chars=>{let line=0;for(let i=0;i<chars;i++)if(code.charCodeAt(i)===10)line++;return line;};
 // What the editor shows at a moment: typed characters and cursor visibility.
 export function editorState(seconds,reduced){
@@ -38,9 +52,13 @@ export function drawEditor(ctx,seconds,reduced){
  const visible=reduced?code:code.slice(0,Math.floor(Math.max(0,seconds-1.6)*70));const lines=visible.split('\n');
  ctx.save();ctx.beginPath();ctx.rect(345,145,1255,650);ctx.clip();ctx.font='24px monospace';
  lines.forEach((line,i)=>{const y=181+i*36;ctx.fillStyle='#707070';ctx.fillText(String(i+1).padStart(2,' '),375,y);let x=435;
- const tokens=line.match(/\/\/.*|"[^"]*"|\b(?:const|export|function|return)\b|\b(?:Portfolio|Projects)\b|[^\s]+|\s+/g)||[];
- for(const token of tokens){ctx.fillStyle=token.startsWith('//')?'#6a9955':token.startsWith('"')?'#ce9178':/^(const|export|function|return)$/.test(token)?'#c586c0':/^(Portfolio|Projects)$/.test(token)?'#dcdcaa':'#9cdcfe';ctx.fillText(token,x,y);x+=ctx.measureText(token).width;}
+ const tokens=line.match(/\/\/.*|"[^"]*"|\b(?:const|export|function|return)\b|\b(?:Portfolio|Projects)\b|[؀-ۿ][؀-ۿ ]*|[^\s؀-ۿ]+|\s+/g)||[];
+ for(const token of tokens){
+  ctx.fillStyle=token.startsWith('//')?'#6a9955':token.startsWith('"')?'#ce9178':/^(const|export|function|return)$/.test(token)?'#c586c0':/^(Portfolio|Projects)$/.test(token)?'#dcdcaa':arabic.test(token)?'#d4d4d4':'#9cdcfe';
+  const rtl=arabic.test(token);if(rtl)ctx.font='24px "IBM Plex Sans Arabic",monospace';
+  fillMixed(ctx,token,x,y);x+=ctx.measureText(token).width;if(rtl)ctx.font='24px monospace';
+ }
  if(i===lines.length-1&&(reduced||Math.floor(seconds*2)%2===0)){ctx.fillStyle='#dedede';ctx.fillRect(x,y-23,2,29);}});ctx.restore();
- ctx.fillStyle='#252526';ctx.fillRect(345,810,1255,160);ctx.fillStyle='#bfbfbf';ctx.font='17px Arial';ctx.fillText('PROBLEMS       OUTPUT       TERMINAL',375,847);ctx.fillStyle='#6a9955';ctx.font='20px monospace';ctx.fillText('✓ Compiled successfully.',375,897);ctx.fillStyle='#999999';ctx.font='18px monospace';ctx.fillText('Scroll naar beneden voor mijn projecten.',375,933);
+ ctx.fillStyle='#252526';ctx.fillRect(345,810,1255,160);ctx.fillStyle='#bfbfbf';ctx.font='17px Arial';ctx.fillText('PROBLEMS       OUTPUT       TERMINAL',375,847);ctx.fillStyle='#6a9955';ctx.font='20px monospace';ctx.fillText('✓ Compiled successfully.',375,897);ctx.fillStyle='#999999';ctx.font=arabic.test(text.hint)?'19px "IBM Plex Sans Arabic",monospace':'18px monospace';fillMixed(ctx,text.hint,375,933);
  ctx.fillStyle='#007acc';ctx.fillRect(0,970,w,30);ctx.fillStyle='#ffffff';ctx.font='16px monospace';ctx.fillText('⑂ main     ✓ 0 problems',24,991);ctx.fillText('TypeScript React     UTF-8     Ln '+lines.length+', Col 1',1060,991);
 }
