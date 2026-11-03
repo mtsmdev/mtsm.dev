@@ -9,9 +9,7 @@ const strings={
   'meta.description':'Portfolio of Moatasem Al-Refaai, software developer. Web apps, Android apps and UI/UX, from frontend to API.',
   'lang.label':'Choose language',
   'hero.name':'Moatasem Al-Refaai','hero.role':'Software developer · UI/UX',
-  'tabs.label':'What the laptop shows','tabs.work':'Projects','tabs.cv':'My CV','tabs.contact':'Contact','tabs.hint':'Drag to spin',
   'dock.label':'Jump to','dock.home':'Home','dock.work':'Work','dock.about':'About','dock.contact':'Contact','dock.cv':'CV',
-  'contact.copy':'Copy email address',
   'hero.label':'Introduction',
   'hero.ihsan':'<strong>Ihsan</strong> <span lang="ar">(إحسان)</span> is Arabic for doing something as well as you possibly can, with care and attention, even when no one is watching. That’s how I like to build.',
   'hero.intro':'Hi, I’m Moatasem. I build web apps that work well and feel good to use, from frontend to API.',
@@ -94,16 +92,16 @@ const strings={
   'about.eduLabel':'EDUCATION','about.eduName':'Software Engineering','about.edu':'Leiden University of Applied Sciences<br>Sep 2021 – Jun 2025',
   'about.langLabel':'LANGUAGES','about.langs':'Dutch · English · Arabic','about.langNote':'Which is why I also build interfaces that read right to left.',
   'about.cvLink':'CV (PDF) ↗',
-  'footer.eyebrow':'Want to work together?','footer.cta':'LET’S BUILD<br>SOMETHING<span>↗</span>','footer.name':'MOATASEM AL-REFAAI'
+  'hero.contact':'Get in touch',
+  'contact.title':'Let’s build something.','contact.lead':'A project, a question or just to say hi? Pick whatever is easiest for you, I’d love to hear from you.',
+  'contact.mail':'Email','contact.whatsapp':'WhatsApp','contact.linkedin':'LinkedIn','contact.copyright':'© 2026 Moatasem Al-Refaai'
  },
  ar:{
   'meta.title':'معتصم الرفاعي — مطوّر برمجيات',
   'meta.description':'معرض أعمال معتصم الرفاعي، مطوّر برمجيات. تطبيقات ويب وأندرويد وتصميم واجهات وتجربة مستخدم، من الواجهة الأمامية حتى الـ API.',
   'lang.label':'اختر اللغة',
   'hero.name':'معتصم الرفاعي','hero.role':'مطوّر برمجيات · UI/UX',
-  'tabs.label':'ما يعرضه الحاسوب','tabs.work':'المشاريع','tabs.cv':'سيرتي الذاتية','tabs.contact':'تواصل','tabs.hint':'اسحب للتدوير',
   'dock.label':'انتقل إلى','dock.home':'الرئيسية','dock.work':'الأعمال','dock.about':'عنّي','dock.contact':'تواصل','dock.cv':'السيرة',
-  'contact.copy':'انسخ البريد الإلكتروني',
   'hero.label':'مقدمة',
   'hero.ihsan':'<strong>الإحسان</strong> أن تؤدي عملك على أحسن وجه، بإتقان وعناية، حتى حين لا يراك أحد. وهكذا أحب أن أبني.',
   'hero.intro':'أهلًا، أنا معتصم. أبني تطبيقات ويب تعمل بكفاءة ويسهل استخدامها، من الواجهة الأمامية حتى الـ API.',
@@ -186,40 +184,24 @@ const strings={
   'about.eduLabel':'التعليم','about.eduName':'هندسة البرمجيات','about.edu':'جامعة لايدن للعلوم التطبيقية<br>سبتمبر 2021 – يونيو 2025',
   'about.langLabel':'اللغات','about.langs':'الهولندية · الإنجليزية · العربية','about.langNote':'لذلك أبني واجهات تعمل بسلاسة من اليمين إلى اليسار أيضًا.',
   'about.cvLink':'السيرة الذاتية (PDF) ↗',
-  'footer.eyebrow':'هل نعمل معًا؟','footer.cta':'لنبنِ<br>شيئًا معًا<span>↗</span>','footer.name':'معتصم الرفاعي'
+  'hero.contact':'تواصل معي',
+  'contact.title':'لنبنِ شيئًا معًا.','contact.lead':'مشروع أو سؤال أو مجرد تعارف؟ اختر الطريقة الأسهل لك، ويسعدني أن أسمع منك.',
+  'contact.mail':'البريد الإلكتروني','contact.whatsapp':'واتساب','contact.linkedin':'لينكدإن','contact.copyright':'© 2026 معتصم الرفاعي'
  }
 };
 // Copy that scripts render (buttons, headline, counters), in every language.
 const scriptStrings={
  nl:{
-  mode:{
-   work:{button:'Bekijk mijn werk',headline:'CODE MET',label:'Bekijk mijn projecten'},
-   cv:{button:'Bekijk mijn CV',headline:['MOATASEM','AL-REFAAI'],label:'Open mijn volledige CV als PDF'},
-   contact:{button:'Mail mij',headline:['LATEN WE','PRATEN'],label:'Stuur een e-mail naar career@mtsm.dev'}
-  },
-  words:['KOFFIE','THEE','CHOCOMELK','IHSAN'],
-  copied:'Gekopieerd',
-  projects:{one:'# project',other:'# projecten'}
+  hero:{button:'Bekijk mijn werk',headline:'CODE MET',label:'Bekijk mijn projecten'},
+  words:['KOFFIE','THEE','CHOCOMELK','IHSAN']
  },
  en:{
-  mode:{
-   work:{button:'View my work',headline:'CODE WITH',label:'View my projects'},
-   cv:{button:'View my CV',headline:['MOATASEM','AL-REFAAI'],label:'Open my full CV as a PDF'},
-   contact:{button:'Email me',headline:['LET’S','TALK'],label:'Send an email to career@mtsm.dev'}
-  },
-  words:['COFFEE','TEA','COCOA','IHSAN'],
-  copied:'Copied',
-  projects:{one:'# project',other:'# projects'}
+  hero:{button:'View my work',headline:'CODE WITH',label:'View my projects'},
+  words:['COFFEE','TEA','COCOA','IHSAN']
  },
  ar:{
-  mode:{
-   work:{button:'شاهد أعمالي',headline:'برمجة',label:'استعرض مشاريعي'},
-   cv:{button:'اطّلع على سيرتي',headline:['معتصم','الرفاعي'],label:'افتح سيرتي الذاتية كاملة بصيغة PDF'},
-   contact:{button:'راسلني',headline:['لنتحدث','معًا'],label:'أرسل بريدًا إلى career@mtsm.dev'}
-  },
-  words:['بالقهوة','بالشاي','بالكاكاو','بإحسان'],
-  copied:'تم النسخ',
-  projects:{zero:'لا مشاريع',one:'مشروع واحد',two:'مشروعان',few:'# مشاريع',many:'# مشروعًا',other:'# مشروع'}
+  hero:{button:'شاهد أعمالي',headline:'برمجة',label:'استعرض مشاريعي'},
+  words:['بالقهوة','بالشاي','بالكاكاو','بإحسان']
  }
 };
 const supported=Object.keys(scriptStrings);

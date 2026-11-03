@@ -1,9 +1,6 @@
 const filters=document.querySelectorAll('[data-filter]');
 const projects=document.querySelectorAll('.tl-project');
 const laptopAction=document.getElementById('laptop-action'),primaryAction=document.querySelector('.hero .primary');
-const modeLinks={work:'#work',cv:'assets/moatasem-cv.pdf',contact:'mailto:career@mtsm.dev'};
-// Button, label and headline for a mode, in the current language (see i18n.js).
-const copyFor=mode=>({...i18n.text().mode[mode],href:modeLinks[mode]});
 // The last headline word cycles through what the code is made with, typed like in an editor.
 // The final word is Ihsan, which gets an explanatory tooltip.
 const wordsFor=()=>i18n.text().words.map((text,i,all)=>({text,tip:i===all.length-1}));
@@ -58,30 +55,22 @@ function whenIntroDone(run){
  if(introPlayed)return run(900);
  introPlayed=true;run(2400);
 }
-function setLaptopMode(mode,rebuild=false){
- if(!modeLinks[mode])return;const copy=copyFor(mode);
- document.body.dataset.laptopMode=mode;
- document.querySelectorAll('[data-laptop-mode]').forEach(tab=>tab.setAttribute('aria-pressed',String(tab.dataset.laptopMode===mode)));
- for(const link of [laptopAction,primaryAction]){link.setAttribute('href',copy.href);link.setAttribute('aria-label',copy.label);if(mode==='cv'){link.target='_blank';link.rel='noopener';}else{link.removeAttribute('target');link.removeAttribute('rel');}}
- laptopAction.textContent=copy.label;
+// Hero headline and button labels in the current language.
+function renderHero(){
+ const copy=i18n.text().hero;
+ laptopAction.textContent=copy.label;laptopAction.setAttribute('aria-label',copy.label);
  primaryAction.querySelector('.btn-label').textContent=copy.button;
  const heading=document.querySelector('.hero h1');
- const current=heading.dataset.mode;
- if(current!==mode||rebuild){
-  rotator?.stop();rotator=null;let rotatingWord=null;const words=wordsFor();
-  const lines=mode==='work'?[copy.headline,null]:copy.headline;
-  heading.replaceChildren(...lines.map((text,index)=>{
-   const line=document.createElement('span');line.className='line';
-   const content=document.createElement('span');
-   if(index===1&&mode==='work')rotatingWord=buildRotatingWord(content,words);else content.textContent=text;
-   if(index===1){const dot=document.createElement('span');dot.className='dot';dot.textContent='.';content.append(dot);}
-   line.append(content);return line;
-  }));
-  heading.dataset.mode=mode;
-  const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(rotatingWord&&!reducedMotion)whenIntroDone(delay=>{if(rotatingWord.isConnected&&!rotator)rotator=startRotator(rotatingWord,delay,words);});
- }
- window.dispatchEvent(new CustomEvent('laptopmodechange',{detail:mode}));
+ rotator?.stop();rotator=null;let rotatingWord=null;const words=wordsFor();
+ heading.replaceChildren(...[copy.headline,null].map((text,index)=>{
+  const line=document.createElement('span');line.className='line';
+  const content=document.createElement('span');
+  if(index===1){rotatingWord=buildRotatingWord(content,words);const dot=document.createElement('span');dot.className='dot';dot.textContent='.';content.append(dot);}
+  else content.textContent=text;
+  line.append(content);return line;
+ }));
+ const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ if(!reducedMotion)whenIntroDone(delay=>{if(rotatingWord.isConnected&&!rotator)rotator=startRotator(rotatingWord,delay,words);});
 }
 let journeyFrame=null;
 function stopJourney(){if(journeyFrame!==null)cancelAnimationFrame(journeyFrame);journeyFrame=null;}
@@ -104,7 +93,6 @@ document.addEventListener('click',event=>{const link=event.target.closest('a');i
 // The portal translates the project section during the camera journey, so use
 // its document position rather than its temporary visual position for anchors.
 function enterProjects(){
- setLaptopMode('work');
  const journey=document.querySelector('.scroll-journey');
  const reduced=document.body.classList.contains('reduced')||document.body.classList.contains('no-webgl');
  const top=journey.offsetTop+journey.offsetHeight-(reduced?0:innerHeight);
@@ -112,30 +100,19 @@ function enterProjects(){
  history.replaceState(null,'','#work');
 }
 document.querySelectorAll('a[href="#work"]').forEach(link=>{if(link===laptopAction||link===primaryAction)return;link.addEventListener('click',event=>{event.preventDefault();enterProjects();});});
-for(const link of [laptopAction,primaryAction])link.addEventListener('click',event=>{if((document.body.dataset.laptopMode||'work')==='work'){event.preventDefault();enterProjects();}});
-// The tabs above the laptop switch what its screen shows; #cv deep-links to the CV view.
-document.querySelectorAll('[data-laptop-mode]').forEach(tab=>tab.addEventListener('click',()=>{
- stopJourney();setLaptopMode(tab.dataset.laptopMode);
- const url=new URL(location.href);url.hash=tab.dataset.laptopMode==='cv'?'cv':'';history.replaceState(null,'',url);
-}));
-setLaptopMode(location.hash==='#cv'?'cv':'work');
+for(const link of [laptopAction,primaryAction])link.addEventListener('click',event=>{event.preventDefault();enterProjects();});
+renderHero();
 filters.forEach(button=>button.addEventListener('click',()=>{
  filters.forEach(b=>{b.classList.toggle('active',b===button);b.setAttribute('aria-pressed',String(b===button));});
  // Projects can belong to several categories; milestones only show on the full timeline.
- const filter=button.dataset.filter;let count=0;
- projects.forEach(project=>{const show=filter==='all'||project.dataset.category.split(' ').includes(filter);project.hidden=!show;if(show)count++;});
+ const filter=button.dataset.filter;
+ projects.forEach(project=>{project.hidden=!(filter==='all'||project.dataset.category.split(' ').includes(filter));});
  document.querySelectorAll('.tl-milestone').forEach(m=>{m.hidden=filter!=='all';});
  document.querySelectorAll('.tl-year').forEach(year=>{year.hidden=!year.querySelector('.tl-item:not([hidden])');});
- updateCount(count);
+ window.dispatchEvent(new CustomEvent('timelinechange'));
 }));
-const counter=document.querySelector('.filter-count');
-function updateCount(count){counter.textContent=i18n.plural(count,i18n.text().projects);}
-updateCount(projects.length);
 // Re-render script-made copy when the visitor switches language.
-window.addEventListener('i18nchange',()=>{
- setLaptopMode(document.body.dataset.laptopMode||'work',true);
- updateCount([...projects].filter(p=>!p.hidden).length);
-});
+window.addEventListener('i18nchange',renderHero);
 
 
 // Dock: highlight the section in view. The projects section is pinned during the laptop journey,
@@ -153,17 +130,6 @@ addEventListener('scroll',()=>{if(!spyQueued){spyQueued=true;requestAnimationFra
 addEventListener('resize',spy,{passive:true});spy();
 // Dock 'Start' returns to the top of the hero.
 document.querySelector('.dock-item[data-section=top]')?.addEventListener('click',event=>{event.preventDefault();stopJourney();scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});history.replaceState(null,'',location.pathname+location.search);});
-// Copy the email address with a short confirmation, announced to screen readers too.
-for(const button of document.querySelectorAll('.copy-email')){
- button.querySelector('span').setAttribute('aria-live','polite');
- button.addEventListener('click',async()=>{
-  const label=button.querySelector('span'),use=button.querySelector('use');
-  try{await navigator.clipboard.writeText(button.dataset.email);}catch{location.href='mailto:'+button.dataset.email;return;}
-  label.textContent=i18n.text().copied;use.setAttribute('href','#i-check');button.classList.add('copied');
-  clearTimeout(button._reset);button._reset=setTimeout(()=>{label.textContent=i18n.t('contact.copy');use.setAttribute('href','#i-copy');button.classList.remove('copied');},2200);
- });
-}
-
 // Cards light up where the pointer is (a radial highlight that follows it).
 document.querySelector('.timeline')?.addEventListener('pointermove',event=>{
  const card=event.target.closest('.tl-card');if(!card||event.pointerType==='touch')return;

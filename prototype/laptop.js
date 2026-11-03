@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import {RoomEnvironment} from './vendor/RoomEnvironment.js';
 import {createXPS} from './xps-reference.js';
 import {drawEditor,editorState,editorDirtyRects,setEditorLanguage} from './editor-screen.js';
-import {drawCV,drawMail} from './laptop-views.js';
 const host=document.getElementById('sculpture'),canvas=document.getElementById('scene'),journey=document.querySelector('.scroll-journey'),work=document.getElementById('work');
 let reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,px=0,py=0,start=performance.now();
 const clamp=v=>Math.max(0,Math.min(1,v));
@@ -11,7 +10,7 @@ document.body.classList.toggle('reduced',reduced);
 const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:.1});document.querySelectorAll('.reveal').forEach(e=>observer.observe(e));
 // Tilt follows a mouse or pen; touch scrolling must not shake the laptop.
 window.addEventListener('pointermove',e=>{if(e.pointerType==='touch')return;px=e.clientX/innerWidth-.5;py=e.clientY/innerHeight-.5;},{passive:true});
-const heroCopy=document.querySelector('.hero-copy'),annotation=document.querySelector('.laptop-panel'),workReveals=[...work.querySelectorAll('.reveal')];
+const heroCopy=document.querySelector('.hero-copy'),workReveals=[...work.querySelectorAll('.reveal')];
 const panel=work.querySelector('.work-screen'),hero=journey.querySelector('.hero');
 let journeyTop=0,journeyEnd=1,lastPageProgress=-1,projectsRevealed=false;
 function measureJourney(){journeyTop=journey.getBoundingClientRect().top+window.scrollY;journeyEnd=Math.max(1,journey.offsetHeight-innerHeight);lastPageProgress=-1;}
@@ -20,7 +19,7 @@ new ResizeObserver(measureJourney).observe(journey);
 function progress(){return clamp((window.scrollY-journeyTop)/journeyEnd);}
 function updatePage(p){
  if(p===lastPageProgress)return;lastPageProgress=p;
- heroCopy.style.opacity=1-smooth(.03,.27,p);heroCopy.style.transform=`translateY(${-smooth(0,.3,p)*50}px)`;heroCopy.style.visibility=p>.3?'hidden':'visible';annotation.style.opacity=1-smooth(.35,.65,p);
+ heroCopy.style.opacity=1-smooth(.03,.27,p);heroCopy.style.transform=`translateY(${-smooth(0,.3,p)*50}px)`;heroCopy.style.visibility=p>.3?'hidden':'visible';
  if(reduced){work.style.opacity=1;work.style.transform='';work.style.pointerEvents='auto';}
  else{
   // Nothing here is moved by script while scrolling: the panel lives in the sticky hero next to the
@@ -49,7 +48,6 @@ const texCanvas=document.createElement('canvas');texCanvas.width=SCREEN_W;texCan
 const screenTexture=new THREE.CanvasTexture(texCanvas);screenTexture.colorSpace=THREE.SRGBColorSpace;screenTexture.generateMipmaps=false;screenTexture.minFilter=THREE.LinearFilter;screenTexture.magFilter=THREE.LinearFilter;screenTexture.anisotropy=maxAnisotropy;
 const stripCanvas=document.createElement('canvas'),stripCtx=stripCanvas.getContext('2d'),stripTexture=new THREE.CanvasTexture(stripCanvas),stripAt=new THREE.Vector2();
 const screenMixUniform={value:0};
-const cvImage=new Image();cvImage.src='./assets/projects/cv-preview.png';
 let renderDirty=true,screenDirty=true,screenRevision=0;
 const pageLang=()=>window.i18n?.lang||'nl';
 const loadArabicFonts=()=>['800 128px Alexandria','400 24px "IBM Plex Sans Arabic"','700 24px "IBM Plex Sans Arabic"'].map(font=>document.fonts.load(font,'ب').catch(()=>{}));
@@ -63,11 +61,9 @@ display.material.onBeforeCompile=shader=>{
 display.material.customProgramCacheKey=()=>'laptop-screen-mix';display.material.needsUpdate=true;
 
 let screenMix=0,lastScreenPaint=-Infinity,modeStarted=start,shownMode='',shownEditor=null;
-cvImage.onload=()=>{if((document.body.dataset.laptopMode||'work')==='cv')screenDirty=true;};
-window.addEventListener('laptopmodechange',()=>{modeStarted=performance.now();screenMix=0;screenDirty=true;});
 const viewSeconds=now=>(now-Math.max(start,modeStarted))/1000;
 function paintFullScreen(mode,seconds){
- if(mode==='cv')drawCV(ctx,cvImage,pageLang());else if(mode==='contact')drawMail(ctx,pageLang());else drawEditor(ctx,seconds,reduced);
+ drawEditor(ctx,seconds,reduced);
  screenTexture.needsUpdate=true;shownMode=mode;shownEditor=mode==='work'?editorState(seconds,reduced):null;screenDirty=false;screenRevision++;
 }
 // Redraw one rectangle of the editor and upload just that strip into the screen texture.
@@ -82,7 +78,7 @@ function updateScreen(now,p,dt){
  screenMix=reduced?target:THREE.MathUtils.damp(screenMix,target,14,dt);if(Math.abs(screenMix-target)<.001)screenMix=target;
  screenMixUniform.value=screenMix;
  if(screenMix>=1)return;// the live view is fully covered by the projects panel
- const mode=document.body.dataset.laptopMode||'work',seconds=viewSeconds(now);
+ const mode='work',seconds=viewSeconds(now);
  if(screenDirty||mode!==shownMode){paintFullScreen(mode,seconds);lastScreenPaint=now;return;}
  if(mode!=='work'||now-lastScreenPaint<33)return;
  const next=editorState(seconds,reduced),rects=editorDirtyRects(shownEditor,next);
@@ -142,7 +138,6 @@ function resize(){
  // On portrait screens the laptop sits in the free space below the hero buttons.
  portrait=camera.aspect<.9;freeTop=heroActions?heroCopy.offsetTop+heroActions.offsetTop+heroActions.offsetHeight:0;
  // Portrait: the laptop tabs sit between the buttons and the laptop.
- if(portrait&&annotation){host.parentElement.style.setProperty('--panel-top',(freeTop+18)+'px');freeTop+=annotation.offsetHeight+18;}
  if(portrait)fitPortrait(w,h);
  layoutPanel();
  renderDirty=true;
@@ -280,8 +275,8 @@ function pose(now,p){
 const loaded=img=>img.decode().catch(()=>{});
 setEditorLanguage(pageLang());
 const arabicFonts=pageLang()==='ar'?loadArabicFonts():[];
-await Promise.race([Promise.all([document.fonts.ready,...arabicFonts,loaded(cvImage)]),new Promise(resolve=>setTimeout(resolve,2500))]);
-paintFullScreen(document.body.dataset.laptopMode||'work',0);
+await Promise.race([Promise.all([document.fonts.ready,...arabicFonts]),new Promise(resolve=>setTimeout(resolve,2500))]);
+paintFullScreen('work',0);
 scene.traverse(object=>{const m=object.material;if(m)for(const slot of ['map','aoMap','alphaMap'])if(m[slot])renderer.initTexture(m[slot]);});
 renderer.initTexture(screenTexture);
 await renderer.compileAsync(scene,camera);showLoad(1);
