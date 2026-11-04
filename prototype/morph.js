@@ -77,7 +77,8 @@ function update(){
  // Step 1 runs over the first stretch of scrolling after the hand-off (shorter if the timeline is close).
  // On phones it takes almost the whole way, so the label grows gradually instead of all at once.
  const total=tgt.y+Math.max(0,d)-holdY,span=Math.max(80,narrow?tgt.y+Math.max(0,d)-H*.45:Math.min(H*.6,total*.85));// on phones: until the real dot has lit up (45% down)
- const a=clamp(d/span),fold=smooth(0,.8,a),move=narrow?smooth(0,1,a):ease(smooth(.25,1,a));
+ // Phones follow the same order as desktop: the ruler folds into the dot first, then the dot moves over.
+ const a=clamp(d/span),fold=narrow?smooth(0,.5,a):smooth(0,.8,a),move=narrow?smooth(.45,1,a):ease(smooth(.25,1,a));
  // The filter chips rise in once the year label has landed in its column, or as they reach the label's
  // height, whichever comes first; scrolling back up sends them away again.
  // On phones they show as soon as they are in view, so it is clear early on that they can be tapped.
