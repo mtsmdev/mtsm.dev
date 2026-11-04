@@ -170,7 +170,7 @@ span.tech-logo{background:var(--brand,var(--bone));-webkit-mask:var(--logo) cent
 .profile-facts small{font:600 13px 'DM Sans',Arial,sans-serif;letter-spacing:.06em;color:#f0a77e}
 .profile-facts strong{font-size:1.125rem;font-weight:600;color:var(--bone)}
 .about .profile-facts p{font-size:15px;line-height:1.6;color:var(--muted)}
-.profile-links a{font-size:16px}
+
 .work .project-filters button span{font:inherit;margin:0;color:inherit}
 /* During the laptop journey the panel lives in the sticky hero, where the screen ends up. */
 .journey-on .hero>.work-screen{position:absolute;left:0;z-index:3;pointer-events:none;will-change:transform,opacity}
@@ -224,7 +224,7 @@ html[lang=ar] .contact h2{font-size:clamp(44px,6.4vw,104px)}
 .contact-value{font-size:clamp(19px,1.7vw,24px);line-height:1.3;font-weight:600;letter-spacing:-.01em;color:var(--bone);overflow-wrap:anywhere;width:fit-content}
 .contact-value:hover{color:var(--accent)}
 [dir=rtl] .contact-value{justify-self:start}
-[dir=rtl] .contact-linkedin .contact-action .icon{scale:-1 1}
+[dir=rtl] .contact-linkedin .contact-action .icon,[dir=rtl] .contact-github .contact-action .icon{scale:-1 1}
 .contact-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
 .contact-action{display:inline-flex;align-items:center;gap:8px;min-height:42px;padding:0 15px;border-radius:999px;border:1px solid var(--line-2);background:transparent;color:var(--bone);font:500 15px 'DM Sans',Arial,sans-serif;cursor:pointer;transition:border-color .25s,background .25s,color .25s}
 .contact-action:hover{border-color:color-mix(in srgb,var(--accent) 60%,transparent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
@@ -318,3 +318,4 @@ html[lang=ar] .tl-card h3{line-height:1.4}
 .journey-on .work .project-filters{margin-bottom:clamp(28px,3.5vw,44px)}
 /* No single word left alone on the intro's last line. */
 .hero .intro{text-wrap:pretty}
+.contact-github{--accent:var(--bone)}

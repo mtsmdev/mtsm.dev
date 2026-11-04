@@ -93,7 +93,7 @@ const strings={
   'about.langLabel':'LANGUAGES','about.langs':'Dutch · English · Arabic','about.langNote':'Also at home in interfaces that read right to left.',
   'hero.contact':'Get in touch','hero.contactShort':'Contact',
   'contact.title':'Let’s build something.','contact.lead':'A project, a question or just to say hi? Pick whatever is easiest for you. I’d love to hear from you.',
-  'contact.mail':'Email','contact.phone':'Phone & WhatsApp','contact.linkedin':'LinkedIn','contact.actMail':'Email','contact.actCopy':'Copy','contact.actCall':'Call','contact.actWhatsapp':'WhatsApp','contact.actProfile':'View profile','contact.copyright':'© 2026 Moatasem Al-Refaai','contact.place':'Leidschendam, the Netherlands'
+  'contact.mail':'Email','contact.phone':'Phone & WhatsApp','contact.linkedin':'LinkedIn','contact.github':'GitHub','contact.actMail':'Email','contact.actCopy':'Copy','contact.actCall':'Call','contact.actWhatsapp':'WhatsApp','contact.actProfile':'View profile','contact.copyright':'© 2026 Moatasem Al-Refaai','contact.place':'Leidschendam, the Netherlands'
  },
  ar:{
   'meta.title':'معتصم الرفاعي — مطوّر برمجيات',
@@ -184,7 +184,7 @@ const strings={
   'about.langLabel':'اللغات','about.langs':'الهولندية · الإنجليزية · العربية','about.langNote':'وأتقن بناء الواجهات التي تُقرأ من اليمين إلى اليسار.',
   'hero.contact':'تواصل معي','hero.contactShort':'تواصل',
   'contact.title':'لنبنِ شيئًا معًا.','contact.lead':'مشروع أو سؤال أو مجرد تعارف؟ اختر الطريقة الأسهل لك، ويسعدني أن أسمع منك.',
-  'contact.mail':'البريد الإلكتروني','contact.phone':'الهاتف وواتساب','contact.linkedin':'لينكدإن','contact.actMail':'راسلني','contact.actCopy':'نسخ','contact.actCall':'اتصال','contact.actWhatsapp':'واتساب','contact.actProfile':'عرض الملف','contact.copyright':'© 2026 معتصم الرفاعي','contact.place':'لايدسخندام، هولندا'
+  'contact.mail':'البريد الإلكتروني','contact.phone':'الهاتف وواتساب','contact.linkedin':'لينكدإن','contact.github':'جيت هب','contact.actMail':'راسلني','contact.actCopy':'نسخ','contact.actCall':'اتصال','contact.actWhatsapp':'واتساب','contact.actProfile':'عرض الملف','contact.copyright':'© 2026 معتصم الرفاعي','contact.place':'لايدسخندام، هولندا'
  }
 };
 // Copy that scripts render (buttons, headline, counters), in every language.
