@@ -316,3 +316,5 @@ html[lang=ar] .tl-card h3{line-height:1.4}
 /* During the journey the timeline starts closer to the ruler's dot. */
 .journey-on .work-body{padding-top:20px}
 .journey-on .work .project-filters{margin-bottom:clamp(28px,3.5vw,44px)}
+/* No single word left alone on the intro's last line. */
+.hero .intro{text-wrap:pretty}
