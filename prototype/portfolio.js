@@ -233,6 +233,10 @@ if(matchMedia('(hover: hover) and (pointer: fine)').matches&&!matchMedia('(prefe
 
 // 'Print CV' in the dock: print.css turns the page into a CV.
 document.querySelector('[data-print]')?.addEventListener('click',()=>print());
+// A saved PDF is named after the page title, so it is called Moatasem CV while printing.
+let screenTitle='';
+addEventListener('beforeprint',()=>{if(document.title!=='Moatasem CV')screenTitle=document.title;document.title='Moatasem CV';});
+addEventListener('afterprint',()=>{if(screenTitle)document.title=screenTitle;});
 
 // Private repos: the link is an email asking for access, with the project and its repos filled in.
 function privateLinks(){
