@@ -101,3 +101,9 @@ h1,h2,h3,.hero-name-text,.tl-card h3,.tl-featured .tl-card h3,.tl-milestone h3{f
 /* Display headings in the text face on paper: Barlow Condensed only ships heavy weights. */
 .about h2,.work-screen h2,.tl-year-label{font-family:'DM Sans',Arial,sans-serif!important;font-weight:600!important;letter-spacing:-.01em!important}
 html[lang=ar] .about h2,html[lang=ar] .work-screen h2{font-family:'Alexandria','IBM Plex Sans Arabic',sans-serif!important}
+/* Firefox shrinks the whole page to fit its widest line, so nothing may run past the page edge: the private
+   repo link prints no address (its mailto link was one 2000px line), and long addresses wrap. */
+.tl-private::after{display:none!important}
+.tl-link[href]::after{overflow-wrap:anywhere}
+.contact-value,.tl-link{overflow-wrap:anywhere}
+.tl-year-label{break-after:avoid}/* a year never ends a page on its own */
